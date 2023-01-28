@@ -1,15 +1,10 @@
 from datetime import datetime
 
-import six
-
-from .. import errors
-from .. import utils
+from .. import errors, utils
 from ..constants import DEFAULT_DATA_CHUNK_SIZE
-from ..types import CancellableStream
-from ..types import ContainerConfig
-from ..types import EndpointConfig
-from ..types import HostConfig
-from ..types import NetworkingConfig
+from ..types import CancellableStream, ContainerConfig, EndpointConfig, HostConfig, NetworkingConfig
+
+import six
 
 
 class ContainerApiMixin(object):

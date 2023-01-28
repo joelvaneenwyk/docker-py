@@ -1,15 +1,12 @@
 import os
 import random
 import sys
+from distutils.spawn import find_executable
+
+from docker.credentials import CredentialsNotFound, DEFAULT_LINUX_STORE, DEFAULT_OSX_STORE, Store, StoreError
 
 import pytest
 import six
-from distutils.spawn import find_executable
-
-from docker.credentials import (
-    CredentialsNotFound, Store, StoreError, DEFAULT_LINUX_STORE,
-    DEFAULT_OSX_STORE
-)
 
 
 class TestStore(object):

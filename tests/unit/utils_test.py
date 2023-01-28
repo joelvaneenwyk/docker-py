@@ -8,17 +8,17 @@ import shutil
 import tempfile
 import unittest
 
-import pytest
-import six
 from docker.api.client import APIClient
-from docker.constants import IS_WINDOWS_PLATFORM, DEFAULT_DOCKER_API_VERSION
+from docker.constants import DEFAULT_DOCKER_API_VERSION, IS_WINDOWS_PLATFORM
 from docker.errors import DockerException
-from docker.utils import (convert_filters, convert_volume_binds,
-                          decode_json_header, kwargs_from_env, parse_bytes,
-                          parse_devices, parse_env_file, parse_host,
-                          parse_repository_tag, split_command, update_headers)
+from docker.utils import (
+    convert_filters, convert_volume_binds, decode_json_header, kwargs_from_env, parse_bytes, parse_devices, parse_env_file,
+    parse_host, parse_repository_tag, split_command, update_headers)
 from docker.utils.ports import build_port_bindings, split_port
 from docker.utils.utils import format_environment
+
+import pytest
+import six
 
 TEST_CERT_DIR = os.path.join(
     os.path.dirname(__file__),

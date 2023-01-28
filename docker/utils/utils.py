@@ -16,7 +16,6 @@ if sys.version_info[0] >= 3:
     from urllib.parse import splitnport, urlparse  # type: ignore
 else:
     from urllib import splitnport
-
     from urlparse import urlparse
 
 if sys.version_info[0] >= 3:

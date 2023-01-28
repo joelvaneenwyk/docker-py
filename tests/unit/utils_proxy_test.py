@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import six
 
 from docker.utils.proxy import ProxyConfig
+
+import six
 
 HTTP = 'http://test:80'
 HTTPS = 'https://test:443'

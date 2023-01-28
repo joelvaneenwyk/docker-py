@@ -1,3 +1,4 @@
 # flake8: noqa
 from .context import Context
-from .api import ContextAPI
+
+from .api import ContextAPI  # isort:skip

@@ -1,9 +1,8 @@
 import base64
 
-import six
+from .. import errors, utils
 
-from .. import errors
-from .. import utils
+import six
 
 
 class SecretApiMixin(object):

@@ -1,9 +1,11 @@
 import copy
+
 import docker
-import pytest
 
 from ..helpers import force_leave_swarm, requires_api_version
 from .base import BaseAPIIntegrationTest
+
+import pytest
 
 
 class SwarmTest(BaseAPIIntegrationTest):

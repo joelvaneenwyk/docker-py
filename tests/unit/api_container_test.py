@@ -6,15 +6,13 @@ import signal
 
 import docker
 from docker.api import APIClient
+
+from ..helpers import requires_api_version
+from . import fake_api
+from .api_test import BaseAPIClientTest, DEFAULT_TIMEOUT_SECONDS, fake_inspect_container, fake_request, url_base, url_prefix
+
 import pytest
 import six
-
-from . import fake_api
-from ..helpers import requires_api_version
-from .api_test import (
-    BaseAPIClientTest, url_prefix, fake_request, DEFAULT_TIMEOUT_SECONDS,
-    fake_inspect_container, url_base
-)
 
 try:
     from unittest import mock

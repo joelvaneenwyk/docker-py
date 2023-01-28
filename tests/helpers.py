@@ -9,6 +9,7 @@ import tempfile
 import time
 
 import docker
+
 import paramiko
 import pytest
 import six

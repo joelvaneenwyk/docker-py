@@ -1,10 +1,10 @@
 import logging
 import os
 
-import six
-
 from .. import auth, errors, utils
 from ..constants import DEFAULT_DATA_CHUNK_SIZE
+
+import six
 
 log = logging.getLogger(__name__)
 

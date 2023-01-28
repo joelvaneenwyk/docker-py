@@ -1,12 +1,10 @@
 import docker
-import pytest
+from docker import auth
 
 from . import fake_api
-from docker import auth
-from .api_test import (
-    BaseAPIClientTest, fake_request, DEFAULT_TIMEOUT_SECONDS, url_prefix,
-    fake_resolve_authconfig
-)
+from .api_test import BaseAPIClientTest, DEFAULT_TIMEOUT_SECONDS, fake_request, fake_resolve_authconfig, url_prefix
+
+import pytest
 
 try:
     from unittest import mock

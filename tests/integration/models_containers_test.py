@@ -2,13 +2,12 @@ import os
 import tempfile
 import threading
 
-import pytest
-
 import docker
-from ..helpers import random_name
-from ..helpers import requires_api_version
-from .base import BaseIntegrationTest
-from .base import TEST_API_VERSION
+
+from ..helpers import random_name, requires_api_version
+from .base import BaseIntegrationTest, TEST_API_VERSION
+
+import pytest
 
 
 class ContainerCollectionTest(BaseIntegrationTest):

@@ -26,11 +26,6 @@ from .service import ServiceApiMixin
 from .swarm import SwarmApiMixin
 from .volume import VolumeApiMixin
 
-import requests
-import requests.exceptions
-import six
-import websocket
-
 try:
     from ..transport import NpipeHTTPAdapter
 except ImportError:
@@ -41,6 +36,10 @@ try:
 except ImportError:
     pass
 
+import requests
+import requests.exceptions
+import six
+import websocket  # type: ignore[import]
 
 class APIClient(
         requests.Session,

@@ -1,7 +1,9 @@
 import copy
+
 from docker.errors import create_unexpected_kwargs_error, InvalidArgument
-from docker.types import TaskTemplate, ContainerSpec, Placement, ServiceMode
-from .resource import Model, Collection
+from docker.types import ContainerSpec, Placement, ServiceMode, TaskTemplate
+
+from .resource import Collection, Model
 
 
 class Service(Model):

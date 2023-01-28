@@ -8,13 +8,12 @@ import tarfile
 import tempfile
 import unittest
 
-
 from docker.constants import IS_WINDOWS_PLATFORM
 from docker.utils import exclude_paths, tar
 
-import pytest
-
 from ..helpers import make_tree
+
+import pytest
 
 
 def convert_paths(collection):

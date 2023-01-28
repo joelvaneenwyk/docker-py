@@ -5,8 +5,7 @@ from __future__ import print_function
 import codecs
 import os
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 ROOT_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.join(ROOT_DIR)
@@ -43,19 +42,18 @@ extras_require = {
 }
 
 version = None
-exec(open('docker/version.py').read())
+exec(open(os.path.join(ROOT_DIR, 'docker', 'version.py')).read())
 
-with open('./requirements-test.txt') as test_reqs_txt:
+with open(os.path.join(ROOT_DIR, 'requirements-test.txt')) as test_reqs_txt:
     test_requirements = [line for line in test_reqs_txt]
 
-
 long_description = ''
-with codecs.open('./README.md', encoding='utf-8') as readme_md:
+with codecs.open(os.path.join(ROOT_DIR, 'README.md'), encoding='utf-8') as readme_md:
     long_description = readme_md.read()
 
 setup(
     name="docker",
-    version=version,
+    version=version or '0.0.0',
     description="A Python library for the Docker Engine API.",
     long_description=long_description,
     long_description_content_type='text/markdown',

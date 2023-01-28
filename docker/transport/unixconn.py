@@ -1,14 +1,15 @@
 import socket
 
+from docker.transport.basehttpadapter import BaseHTTPAdapter
+
 from .. import constants
 
 import requests.adapters
 import six
-from docker.transport.basehttpadapter import BaseHTTPAdapter
 from six.moves import http_client as httplib
 
 try:
-    import requests.packages.urllib3 as urllib3
+    import requests.packages.urllib3 as urllib3  # type: ignore[import]
 except ImportError:
     import urllib3  # type: ignore
 

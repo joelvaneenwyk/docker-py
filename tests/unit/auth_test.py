@@ -10,6 +10,7 @@ import tempfile
 import unittest
 
 from docker import auth, credentials, errors
+
 import pytest
 
 try:

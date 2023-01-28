@@ -1,7 +1,7 @@
 import socket
 
 try:
-    import requests.packages.urllib3 as urllib3
+    import requests.packages.urllib3 as urllib3  # type: ignore[import]
 except ImportError:
     import urllib3  # type: ignore
 
@@ -66,8 +66,7 @@ class CancellableStream(object):
             else:
                 sock = sock_fp._sock
 
-            if hasattr(urllib3.contrib, 'pyopenssl') and isinstance(
-                    sock, urllib3.contrib.pyopenssl.WrappedSocket):
+            if hasattr(urllib3.contrib, 'pyopenssl') and isinstance(sock, urllib3.contrib.pyopenssl.WrappedSocket):
                 sock = sock.socket
 
             sock.shutdown(socket.SHUT_RDWR)

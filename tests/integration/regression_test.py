@@ -2,10 +2,11 @@ import io
 import random
 
 import docker
-import six
 
 from .base import BaseAPIIntegrationTest, TEST_IMG
+
 import pytest
+import six
 
 
 class TestRegressions(BaseAPIIntegrationTest):

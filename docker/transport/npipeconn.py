@@ -1,9 +1,10 @@
+from docker.transport.basehttpadapter import BaseHTTPAdapter
+
 from .. import constants
 from .npipesocket import NpipeSocket
 
 import requests.adapters
 import six
-from docker.transport.basehttpadapter import BaseHTTPAdapter
 
 if six.PY3:
     import http.client as httplib
@@ -11,7 +12,7 @@ else:
     import httplib
 
 try:
-    import requests.packages.urllib3 as urllib3
+    import requests.packages.urllib3 as urllib3  # type: ignore[import]
 except ImportError:
     import urllib3  # type: ignore
 

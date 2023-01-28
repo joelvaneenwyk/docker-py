@@ -1,6 +1,6 @@
-import six
-
 from .. import auth, utils
+
+import six
 
 
 class PluginApiMixin(object):

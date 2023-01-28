@@ -1,10 +1,13 @@
 import os
 import tempfile
-import pytest
+
 from docker import errors
 from docker.context import ContextAPI
 from docker.tls import TLSConfig
+
 from .base import BaseAPIIntegrationTest
+
+import pytest
 
 
 class ContextLifecycleTest(BaseAPIIntegrationTest):

@@ -5,20 +5,17 @@ import tempfile
 import threading
 from datetime import datetime
 
+import docker
+from docker.constants import IS_WINDOWS_PLATFORM
+from docker.utils.socket import next_frame_header, read_exactly
+
+from .. import helpers
+from ..helpers import assert_cat_socket_detached_with_keys, ctrl_with, requires_api_version
+from .base import BaseAPIIntegrationTest, TEST_IMG
+
 import pytest
 import requests
 import six
-
-import docker
-from .. import helpers
-from ..helpers import assert_cat_socket_detached_with_keys
-from ..helpers import ctrl_with
-from ..helpers import requires_api_version
-from .base import BaseAPIIntegrationTest
-from .base import TEST_IMG
-from docker.constants import IS_WINDOWS_PLATFORM
-from docker.utils.socket import next_frame_header
-from docker.utils.socket import read_exactly
 
 
 class ListContainersTest(BaseAPIIntegrationTest):

@@ -1,11 +1,13 @@
-import docker
-from docker.constants import DEFAULT_DATA_CHUNK_SIZE
-from docker.models.containers import Container, _create_container_args
-from docker.models.images import Image
 import unittest
 
-from .fake_api import FAKE_CONTAINER_ID, FAKE_IMAGE_ID, FAKE_EXEC_ID
+import docker
+from docker.constants import DEFAULT_DATA_CHUNK_SIZE
+from docker.models.containers import _create_container_args, Container
+from docker.models.images import Image
+
+from .fake_api import FAKE_CONTAINER_ID, FAKE_EXEC_ID, FAKE_IMAGE_ID
 from .fake_api_client import make_fake_client
+
 import pytest
 
 

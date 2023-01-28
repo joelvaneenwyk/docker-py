@@ -2,14 +2,14 @@ import itertools
 import re
 import warnings
 
-import six
-
 from ..api import APIClient
 from ..constants import DEFAULT_DATA_CHUNK_SIZE
 from ..errors import BuildError, ImageLoadError, InvalidArgument
 from ..utils import parse_repository_tag
 from ..utils.json_stream import json_stream
 from .resource import Collection, Model
+
+import six
 
 
 class Image(Model):

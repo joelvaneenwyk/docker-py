@@ -5,10 +5,11 @@
 import sys
 
 from docker.transport.basehttpadapter import BaseHTTPAdapter
+
 from requests.adapters import HTTPAdapter
 
 try:
-    import requests.packages.urllib3 as urllib3
+    import requests.packages.urllib3 as urllib3  # type: ignore[import]
 except ImportError:
     import urllib3  # type: ignore
 
@@ -16,6 +17,7 @@ if sys.version_info[0] >= 3:
     import warnings
 
     warnings.filterwarnings("ignore", message="The distutils package is deprecated")
+    warnings.filterwarnings("ignore", message="distutils Version classes are deprecated")
 
 from distutils.version import StrictVersion
 

@@ -1,11 +1,8 @@
-import six
-
 from .. import errors
 from ..constants import IS_WINDOWS_PLATFORM
-from ..utils import (
-    check_resource, format_environment, format_extra_hosts, parse_bytes,
-    split_command, convert_service_networks,
-)
+from ..utils import check_resource, convert_service_networks, format_environment, format_extra_hosts, parse_bytes, split_command
+
+import six
 
 
 class TaskTemplate(dict):

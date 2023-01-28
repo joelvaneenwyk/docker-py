@@ -2,12 +2,10 @@ import errno
 import json
 import subprocess
 
-import six
+from . import constants, errors
+from .utils import create_environment_dict, find_executable
 
-from . import constants
-from . import errors
-from .utils import create_environment_dict
-from .utils import find_executable
+import six
 
 
 class Store(object):

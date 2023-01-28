@@ -6,10 +6,10 @@ import docker
 from docker import auth
 from docker.api.build import process_dockerfile
 
-import pytest
-
 from ..helpers import make_tree
 from .api_test import BaseAPIClientTest, fake_request, url_prefix
+
+import pytest
 
 
 class BuildTest(BaseAPIClientTest):

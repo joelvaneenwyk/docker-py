@@ -3,14 +3,12 @@ import os
 import unittest
 
 import docker
-import pytest
-from docker.constants import (
-    DEFAULT_DOCKER_API_VERSION, DEFAULT_TIMEOUT_SECONDS,
-    DEFAULT_MAX_POOL_SIZE, IS_WINDOWS_PLATFORM
-)
+from docker.constants import DEFAULT_DOCKER_API_VERSION, DEFAULT_MAX_POOL_SIZE, DEFAULT_TIMEOUT_SECONDS, IS_WINDOWS_PLATFORM
 from docker.utils import kwargs_from_env
 
 from . import fake_api
+
+import pytest
 
 try:
     from unittest import mock

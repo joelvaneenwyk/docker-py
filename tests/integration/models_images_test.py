@@ -2,10 +2,11 @@ import io
 import tempfile
 
 import docker
-import pytest
 
-from .base import BaseIntegrationTest, TEST_IMG, TEST_API_VERSION
 from ..helpers import random_name
+from .base import BaseIntegrationTest, TEST_API_VERSION, TEST_IMG
+
+import pytest
 
 
 class ImageCollectionTest(BaseIntegrationTest):

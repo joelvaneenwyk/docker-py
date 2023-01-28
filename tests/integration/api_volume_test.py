@@ -1,8 +1,9 @@
 import docker
-import pytest
 
 from ..helpers import requires_api_version
 from .base import BaseAPIIntegrationTest
+
+import pytest
 
 
 class TestVolumes(BaseAPIIntegrationTest):

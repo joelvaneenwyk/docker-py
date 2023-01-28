@@ -2,15 +2,12 @@
 
 import unittest
 
-import pytest
-
 from docker.constants import DEFAULT_DOCKER_API_VERSION
 from docker.errors import InvalidArgument, InvalidVersion
-from docker.types import (
-    ContainerSpec, EndpointConfig, HostConfig, IPAMConfig,
-    IPAMPool, LogConfig, Mount, ServiceMode, Ulimit,
-)
+from docker.types import ContainerSpec, EndpointConfig, HostConfig, IPAMConfig, IPAMPool, LogConfig, Mount, ServiceMode, Ulimit
 from docker.types.services import convert_service_ports
+
+import pytest
 
 try:
     from unittest import mock

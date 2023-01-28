@@ -12,14 +12,15 @@ import time
 import unittest
 
 import docker
+from docker.api import APIClient
+from docker.constants import DEFAULT_DOCKER_API_VERSION
+
+from . import fake_api
+
 import pytest
 import requests
 import six
-from docker.api import APIClient
-from docker.constants import DEFAULT_DOCKER_API_VERSION
 from requests.packages import urllib3
-
-from . import fake_api
 
 try:
     from unittest import mock

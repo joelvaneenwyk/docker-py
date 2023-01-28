@@ -6,16 +6,14 @@ import tarfile
 import tempfile
 import threading
 
-import pytest
-import six
-from six.moves import BaseHTTPServer
-from six.moves import socketserver
-
-
 import docker
 
 from ..helpers import requires_api_version, requires_experimental
 from .base import BaseAPIIntegrationTest, TEST_IMG
+
+import pytest
+import six
+from six.moves import BaseHTTPServer, socketserver
 
 
 class ListImagesTest(BaseAPIIntegrationTest):

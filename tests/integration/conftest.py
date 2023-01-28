@@ -5,9 +5,10 @@ import warnings
 
 import docker.errors
 from docker.utils import kwargs_from_env
-import pytest
 
 from .base import TEST_IMG
+
+import pytest
 
 
 @pytest.fixture(autouse=True, scope='session')

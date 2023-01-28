@@ -1,8 +1,8 @@
 import base64
 
-import six
-
 from .. import utils
+
+import six
 
 
 class ConfigApiMixin(object):

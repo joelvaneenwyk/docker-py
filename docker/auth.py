@@ -2,11 +2,10 @@ import base64
 import json
 import logging
 
-import six
-
-from . import credentials
-from . import errors
+from . import credentials, errors
 from .utils import config
+
+import six
 
 INDEX_NAME = 'docker.io'
 INDEX_URL = 'https://index.{0}/v1/'.format(INDEX_NAME)

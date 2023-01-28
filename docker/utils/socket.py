@@ -3,13 +3,14 @@ import os
 import select
 import socket as pysocket
 import struct
+import sys
 
 import six
 
 try:
     from ..transport import NpipeSocket
 except ImportError:
-    class NpipeSocket(object):
+    class NpipeSocket(object):  # type: ignore[no-redef]
         pass
 
 
@@ -28,7 +29,7 @@ def read(socket, n=4096):
 
     recoverable_errors = (errno.EINTR, errno.EDEADLK, errno.EWOULDBLOCK)
 
-    if six.PY3 and not isinstance(socket, NpipeSocket):
+    if sys.version_info[0] >= 3 and not isinstance(socket, NpipeSocket):
         select.select([socket], [], [])
 
     try:

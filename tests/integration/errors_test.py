@@ -1,5 +1,7 @@
 from docker.errors import APIError
+
 from .base import BaseAPIIntegrationTest, TEST_IMG
+
 import pytest
 
 

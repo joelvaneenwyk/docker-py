@@ -1,9 +1,10 @@
 import json
 
-import six
-
-from .api_test import BaseAPIClientTest, url_prefix, response
 from docker.types import IPAMConfig, IPAMPool
+
+from .api_test import BaseAPIClientTest, response, url_prefix
+
+import six
 
 try:
     from unittest import mock

@@ -6,11 +6,11 @@ import tempfile
 from docker import errors
 from docker.utils.proxy import ProxyConfig
 
+from ..helpers import random_name, requires_api_version, requires_experimental
+from .base import BaseAPIIntegrationTest, TEST_IMG
+
 import pytest
 import six
-
-from .base import BaseAPIIntegrationTest, TEST_IMG
-from ..helpers import random_name, requires_api_version, requires_experimental
 
 
 class BuildTest(BaseAPIIntegrationTest):

@@ -2,6 +2,7 @@ import copy
 
 import docker
 from docker.constants import DEFAULT_DOCKER_API_VERSION
+
 from . import fake_api
 
 try:

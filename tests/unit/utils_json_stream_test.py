@@ -1,8 +1,7 @@
 # encoding: utf-8
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from docker.utils.json_stream import json_splitter, stream_as_text, json_stream
+from docker.utils.json_stream import json_splitter, json_stream, stream_as_text
 
 
 class TestJsonSplitter(object):
