@@ -2,18 +2,11 @@ import json
 import struct
 from functools import partial
 
-import requests
-import requests.exceptions
-import six
-import websocket
-
 from .. import auth
-from ..constants import (DEFAULT_NUM_POOLS, DEFAULT_NUM_POOLS_SSH,
-                         DEFAULT_MAX_POOL_SIZE, DEFAULT_TIMEOUT_SECONDS,
-                         DEFAULT_USER_AGENT, IS_WINDOWS_PLATFORM,
-                         MINIMUM_DOCKER_API_VERSION, STREAM_HEADER_SIZE_BYTES)
-from ..errors import (DockerException, InvalidVersion, TLSParameterError,
-                      create_api_error_from_http_exception)
+from ..constants import (
+    DEFAULT_MAX_POOL_SIZE, DEFAULT_NUM_POOLS, DEFAULT_NUM_POOLS_SSH, DEFAULT_TIMEOUT_SECONDS, DEFAULT_USER_AGENT,
+    IS_WINDOWS_PLATFORM, MINIMUM_DOCKER_API_VERSION, STREAM_HEADER_SIZE_BYTES)
+from ..errors import create_api_error_from_http_exception, DockerException, InvalidVersion, TLSParameterError
 from ..tls import TLSConfig
 from ..transport import SSLHTTPAdapter, UnixHTTPAdapter
 from ..utils import check_resource, config, update_headers, utils
@@ -32,6 +25,11 @@ from .secret import SecretApiMixin
 from .service import ServiceApiMixin
 from .swarm import SwarmApiMixin
 from .volume import VolumeApiMixin
+
+import requests
+import requests.exceptions
+import six
+import websocket
 
 try:
     from ..transport import NpipeHTTPAdapter
@@ -316,6 +314,9 @@ class APIClient(
 
     def _get_raw_response_socket(self, response):
         self._raise_for_status(response)
+
+        assert self.base_url is not None
+
         if self.base_url == "http+docker://localnpipe":
             sock = response.raw._fp.fp.raw.sock
         elif self.base_url.startswith('http+docker://ssh'):
@@ -326,6 +327,10 @@ class APIClient(
                 sock = sock._sock
         else:
             sock = response.raw._fp.fp._sock
+
+        if not hasattr(sock, "send"):
+            sock = sock._sock
+
         try:
             # Keep a reference to the response to stop it being garbage
             # collected. If the response is garbage collected, it will
@@ -417,7 +422,7 @@ class APIClient(
 
         if stream:
             return gen
-        else:
+
         # Wait for all the frames, concatenate them, and return the result
         return consume_socket_output(gen, demux=demux)
 

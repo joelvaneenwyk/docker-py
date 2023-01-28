@@ -1,7 +1,6 @@
-import six
+from .. import errors, utils
 
-from .. import errors
-from .. import utils
+import six
 
 
 class ExecApiMixin(object):
@@ -119,8 +118,7 @@ class ExecApiMixin(object):
     @utils.check_resource('exec_id')
     def exec_start(self, exec_id, detach=False, tty=False, stream=False,
                    socket=False, demux=False):
-        """
-        Start a previously set up exec instance.
+        """Start a previously set up exec instance.
 
         Args:
             exec_id (str): ID of the exec instance

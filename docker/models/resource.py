@@ -1,3 +1,8 @@
+try:
+    from typing import Optional, Type  # noqa
+except ImportError:
+    pass
+
 
 class Model(object):
     """
@@ -56,7 +61,7 @@ class Collection(object):
     """
 
     #: The type of object this collection represents, set by subclasses
-    model = None
+    model = None  # type: Optional[Type[Model]]
 
     def __init__(self, client=None):
         #: The client pointing at the server that this collection of objects

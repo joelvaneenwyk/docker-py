@@ -4,11 +4,10 @@ import re
 import tarfile
 import tempfile
 
-import six
-
-from .fnmatch import fnmatch
 from ..constants import IS_WINDOWS_PLATFORM
+from .fnmatch import fnmatch
 
+import six
 
 _SEP = re.compile('/|\\\\') if IS_WINDOWS_PLATFORM else re.compile('/')
 

@@ -63,7 +63,7 @@ class IPAMConfig(dict):
           Defaults to `None`.
 
     Example:
-
+        >>> import docker.types
         >>> ipam_config = docker.types.IPAMConfig(driver='default')
         >>> network = client.create_network('network1', ipam=ipam_config)
 

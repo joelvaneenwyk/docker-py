@@ -4,23 +4,27 @@ import os
 import os.path
 import shlex
 import string
+import sys
 from datetime import datetime
-from distutils.version import StrictVersion
+
+from .. import errors, tls
+from ..constants import BYTE_UNITS, DEFAULT_HTTP_HOST, DEFAULT_NPIPE, DEFAULT_UNIX_SOCKET
 
 import six
 
-from .. import errors
-from .. import tls
-from ..constants import DEFAULT_HTTP_HOST
-from ..constants import DEFAULT_UNIX_SOCKET
-from ..constants import DEFAULT_NPIPE
-from ..constants import BYTE_UNITS
-
 if six.PY2:
     from urllib import splitnport
+
     from urlparse import urlparse
 else:
-    from urllib.parse import splitnport, urlparse
+    from urllib.parse import splitnport, urlparse  # type: ignore
+
+if sys.version_info[0] >= 3:
+    import warnings
+
+    warnings.filterwarnings("ignore", message="The distutils package is deprecated")
+
+from distutils.version import StrictVersion
 
 
 def create_ipam_pool(*args, **kwargs):

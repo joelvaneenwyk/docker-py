@@ -14,7 +14,7 @@ import re
 
 __all__ = ["fnmatch", "fnmatchcase", "translate"]
 
-_cache = {}
+_cache = {}  # type: ignore
 _MAXCACHE = 100
 
 

@@ -143,5 +143,4 @@ def assert_cat_socket_detached_with_keys(sock, inputs):
 def ctrl_with(char):
     if re.match('[a-z]', char):
         return chr(ord(char) - ord('a') + 1).encode('ascii')
-    else:
-        raise(Exception('char must be [a-z]'))
+    raise Exception('char must be [a-z]')

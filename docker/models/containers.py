@@ -4,14 +4,16 @@ from collections import namedtuple
 
 from ..api import APIClient
 from ..constants import DEFAULT_DATA_CHUNK_SIZE
-from ..errors import (
-    ContainerError, DockerException, ImageNotFound,
-    NotFound, create_unexpected_kwargs_error
-)
+from ..errors import ContainerError, create_unexpected_kwargs_error, DockerException, ImageNotFound, NotFound
 from ..types import HostConfig
 from ..utils import version_gte
 from .images import Image
 from .resource import Collection, Model
+
+try:
+    from typing import Any, Optional, Union  # noqa
+except ImportError:
+    pass
 
 
 class Container(Model):
@@ -515,8 +517,8 @@ class Container(Model):
 class ContainerCollection(Collection):
     model = Container
 
-    def run(self, image, command=None, stdout=True, stderr=False,
-            remove=False, **kwargs):
+    def run(self, image, command=None, stdout=True, stderr=False, remove=False, **kwargs):
+        # type: (Union[str, Image], Optional[str], bool, bool, bool, **Any) -> Union[Optional[bytes], Container]
         """
         Run a container. By default, it will wait for the container to finish
         and return its logs, similar to ``docker run``.
@@ -871,6 +873,7 @@ class ContainerCollection(Collection):
         return self.get(resp['Id'])
 
     def get(self, container_id):
+        # type: (str) -> Container
         """
         Get a container by name or ID.
 

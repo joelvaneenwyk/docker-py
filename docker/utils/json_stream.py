@@ -1,13 +1,11 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
-import json.decoder
-
-import six
+import json.decoder  # type: ignore
 
 from ..errors import StreamParseError
 
+import six
 
 json_decoder = json.JSONDecoder()
 

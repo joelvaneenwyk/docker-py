@@ -3,11 +3,7 @@ import logging
 import os
 import random
 
-from .. import auth
-from .. import constants
-from .. import errors
-from .. import utils
-
+from .. import auth, constants, errors, utils
 
 log = logging.getLogger(__name__)
 
@@ -153,7 +149,7 @@ class BuildApiMixin(object):
                 with open(dockerignore, 'r') as f:
                     exclude = list(filter(
                         lambda x: x != '' and x[0] != '#',
-                        [l.strip() for l in f.read().splitlines()]
+                        [line.strip() for line in f.read().splitlines()]
                     ))
             dockerfile = process_dockerfile(dockerfile, path)
             context = utils.tar(
