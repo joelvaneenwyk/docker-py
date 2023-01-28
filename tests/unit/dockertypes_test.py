@@ -14,8 +14,8 @@ from docker.types.services import convert_service_ports
 
 try:
     from unittest import mock
-except:  # noqa: E722
-    import mock
+except ImportError:
+    import mock  # noqa: F401
 
 
 def create_host_config(*args, **kwargs):

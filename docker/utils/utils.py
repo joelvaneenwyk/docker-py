@@ -12,12 +12,12 @@ from ..constants import BYTE_UNITS, DEFAULT_HTTP_HOST, DEFAULT_NPIPE, DEFAULT_UN
 
 import six
 
-if six.PY2:
+if sys.version_info[0] >= 3:
+    from urllib.parse import splitnport, urlparse  # type: ignore
+else:
     from urllib import splitnport
 
     from urlparse import urlparse
-else:
-    from urllib.parse import splitnport, urlparse  # type: ignore
 
 if sys.version_info[0] >= 3:
     import warnings
