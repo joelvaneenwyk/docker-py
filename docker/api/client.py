@@ -418,8 +418,8 @@ class APIClient(
         if stream:
             return gen
         else:
-            # Wait for all the frames, concatenate them, and return the result
-            return consume_socket_output(gen, demux=demux)
+        # Wait for all the frames, concatenate them, and return the result
+        return consume_socket_output(gen, demux=demux)
 
     def _disable_socket_timeout(self, socket):
         """ Depending on the combination of python version and whether we're

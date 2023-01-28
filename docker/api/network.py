@@ -75,7 +75,7 @@ class NetworkApiMixin(object):
         Example:
             A network using the bridge driver:
 
-                >>> client.create_network("network1", driver="bridge")
+            >>> client.create_network("network1", driver="bridge")
 
             You can also create more advanced networks with custom IPAM
             configurations. For example, setting the subnet to
