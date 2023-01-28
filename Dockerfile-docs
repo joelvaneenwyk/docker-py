@@ -9,7 +9,7 @@ RUN addgroup --gid $gid sphinx \
  && useradd --uid $uid --gid $gid -M sphinx
 
 WORKDIR /src
-COPY requirements.txt docs-requirements.txt ./
-RUN pip install -r requirements.txt -r docs-requirements.txt
+COPY requirements.txt requirements-docs.txt ./
+RUN pip install -r requirements.txt -r requirements-docs.txt
 
 USER sphinx
