@@ -18,6 +18,7 @@ class WinError(Exception):
         self.funcname = funcname
         self.strerror = strerror
 
+
 BOOL = ctypes.c_long
 
 GENERIC_READ = 0x80000000
@@ -51,12 +52,12 @@ LONG = ctypes.c_long
 DWORD = ctypes.c_ulong
 
 LPDWORD = ctypes.POINTER(DWORD)
-HANDLE = ctypes.c_void_p # in the header files: void *
+HANDLE = ctypes.c_void_p  # in the header files: void *
 Handle = HANDLE
 
 try:
     import ctypes.wintypes
-except ImportError:
+except (ImportError, ValueError):
     setattr(ctypes, 'wintypes', None)
 
 
@@ -216,7 +217,7 @@ class Win32(object):
             import ctypes.wintypes as wintypes
 
             self._wintypes = wintypes
-        except AttributeError:
+        except (AttributeError, ValueError):
             self._wintypes = None
 
         try:
