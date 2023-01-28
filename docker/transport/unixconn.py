@@ -1,21 +1,22 @@
-import six
-import requests.adapters
 import socket
-from six.moves import http_client as httplib
 
-from docker.transport.basehttpadapter import BaseHTTPAdapter
 from .. import constants
+
+import requests.adapters
+import six
+from docker.transport.basehttpadapter import BaseHTTPAdapter
+from six.moves import http_client as httplib
 
 try:
     import requests.packages.urllib3 as urllib3
 except ImportError:
-    import urllib3
+    import urllib3  # type: ignore
 
 
 RecentlyUsedContainer = urllib3._collections.RecentlyUsedContainer
 
 
-class UnixHTTPResponse(httplib.HTTPResponse, object):
+class UnixHTTPResponse(httplib.HTTPResponse, object):  # type: ignore
     def __init__(self, sock, *args, **kwargs):
         disable_buffering = kwargs.pop('disable_buffering', False)
         if six.PY2:

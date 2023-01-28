@@ -1,6 +1,9 @@
 # flake8: noqa
-from .unixconn import UnixHTTPAdapter
+# pyright: reportUnusedImport=false
+
 from .ssladapter import SSLHTTPAdapter
+from .unixconn import UnixHTTPAdapter
+
 try:
     from .npipeconn import NpipeHTTPAdapter
     from .npipesocket import NpipeSocket
