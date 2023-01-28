@@ -1,16 +1,259 @@
+import ctypes
+import ctypes.wintypes
 import functools
-import time
 import io
+import time
 
 import six
-import win32file
-import win32pipe
+
+try:
+    from typing import Any, MutableSequence, Optional, Tuple, Type, Union  # noqa
+except ImportError:
+    pass
+
+
+class WinError(Exception):
+    def __init__(self, winerror, funcname, strerror):
+        # type: (int, str, str) -> None
+        self.winerror = winerror
+        self.funcname = funcname
+        self.strerror = strerror
+
+
+LPWSTR = ctypes.wintypes.LPWSTR
+LPCWSTR = ctypes.wintypes.LPCWSTR
+LPCSTR = ctypes.wintypes.LPCSTR
+ULONG = ctypes.wintypes.ULONG
+DWORD = ctypes.wintypes.DWORD
+LPDWORD = ctypes.POINTER(DWORD)
+LPOVERLAPPED = ctypes.wintypes.LPVOID
+LPSECURITY_ATTRIBUTES = ctypes.wintypes.LPVOID
+
+GENERIC_READ = 0x80000000
+GENERIC_WRITE = 0x40000000
+GENERIC_EXECUTE = 0x20000000
+GENERIC_ALL = 0x10000000
+
+CREATE_NEW = 1
+CREATE_ALWAYS = 2
+OPEN_EXISTING = 3
+OPEN_ALWAYS = 4
+TRUNCATE_EXISTING = 5
+
+FILE_ATTRIBUTE_NORMAL = 0x00000080
+
+INVALID_HANDLE_VALUE = -1
+
+NULL = 0
+BOOL = ctypes.wintypes.BOOL
+FALSE = BOOL(0)
+TRUE = BOOL(1)
+
+Handle = ctypes.wintypes.HANDLE
+HANDLE = Handle
+
+
+class _US(ctypes.Structure):
+    _fields_ = [
+        ("Offset", DWORD),
+        ("OffsetHigh", DWORD),
+    ]
+
+
+class _U(ctypes.Union):
+    _fields_ = [
+        ("s", _US),
+        ("Pointer", ctypes.c_void_p),
+    ]
+
+    _anonymous_ = ("s",)
+
+
+class OVERLAPPED(ctypes.Structure):
+    _fields_ = [
+        ("Internal", ctypes.POINTER(ULONG)),
+        ("InternalHigh", ctypes.POINTER(ULONG)),
+        ("u", _U),
+        ("hEvent", HANDLE),
+        # Custom fields.
+        ("channel", ctypes.py_object),
+    ]
+    _anonymous_ = ("u",)
+
+
+ReadFile = ctypes.windll.kernel32.ReadFile  # type: ignore[attr-defined]
+ReadFile.argtypes = (HANDLE, ctypes.c_void_p, DWORD, ctypes.POINTER(DWORD), ctypes.POINTER(OVERLAPPED))
+ReadFile.restype = BOOL
+
+WriteFile = ctypes.windll.kernel32.WriteFile  # type: ignore[attr-defined]
+WriteFile.argtypes = (HANDLE, ctypes.c_void_p, DWORD, ctypes.POINTER(DWORD), ctypes.POINTER(OVERLAPPED))
+WriteFile.restype = BOOL
+
+CreateFileA = ctypes.windll.kernel32.CreateFileA  # type: ignore[attr-defined]
+CreateFileA.argtypes = (LPCSTR, DWORD, DWORD, ctypes.c_void_p, DWORD, DWORD, HANDLE)
+CreateFileA.restype = HANDLE
+
+CreateFileW = ctypes.windll.kernel32.CreateFileW  # type: ignore[attr-defined]
+CreateFileW.argtypes = (LPCWSTR, DWORD, DWORD, ctypes.c_void_p, DWORD, DWORD, HANDLE)
+CreateFileW.restype = HANDLE
+
+CloseHandle = ctypes.windll.kernel32.CloseHandle  # type: ignore[attr-defined]
+CloseHandle.argtypes = (HANDLE,)
+CloseHandle.restype = BOOL
+
+
+def _CloseHandle(handle):
+    # type: (Handle) -> None
+    return CloseHandle(handle)
+
+
+def _ReadFile(
+        handle,         # type: Handle
+        read_size,      # type: int
+):  # type: (...) -> Tuple[int, bytes]
+    """See: CreateFile function
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
+    """
+    buffer = ctypes.create_string_buffer(b"", read_size)
+    number_of_bytes_read = DWORD(0)
+    result = BOOL(ReadFile(handle, ctypes.byref(buffer), read_size, ctypes.byref(number_of_bytes_read), None))
+    if result.value == 0:
+        raise WinError(result.value, "ReadFile", "Failed to read file.")
+    return number_of_bytes_read.value, ctypes.string_at(buffer)
+
+
+def _WriteFile(
+        handle,     # type: Handle
+        buffer      # type: bytes
+):  # type: (...) -> Tuple[int, int]
+    """See: CreateFile function
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
+    """
+    number_of_bytes_written = DWORD(0)
+    result = BOOL(WriteFile(
+        handle,
+        buffer, len(buffer),
+        ctypes.byref(number_of_bytes_written), None))
+    if result.value == 0:
+        raise WinError(result.value, "WriteFile", "Failed to write file.")
+    return result.value, number_of_bytes_written.value
+
+
+def _CreateFile(
+        filename,   # type: str
+        access,     # type: int
+        mode,       # type: int
+        creation,   # type: int
+        flags,      # type: int
+):  # type: (...) -> Handle
+    """See: CreateFile function
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
+    """
+    return HANDLE(CreateFileW(filename, access, mode, None, creation, flags, None))
+
+
+def _GetNamedPipeInfo(handle):
+    # type: (Handle) -> Tuple[int, int, int, int]
+    """See: CreateFile function
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
+    """
+    GetNamedPipeInfo_Fn = ctypes.windll.kernel32.GetNamedPipeInfo  # type: ignore[attr-defined]
+    GetNamedPipeInfo_Fn.argtypes = [
+        HANDLE,     # [in]            HANDLE  hNamedPipe,
+        LPDWORD,    # [out, optional] LPDWORD lpFlags,
+        LPDWORD,    # [out, optional] LPDWORD lpOutBufferSize,
+        LPDWORD,    # [out, optional] LPDWORD lpInBufferSize,
+        LPDWORD,    # [out, optional] LPDWORD lpMaxInstances
+    ]
+    GetNamedPipeInfo_Fn.restype = BOOL
+
+    lpFlags = DWORD()
+    lpOutBufferSize = DWORD()
+    lpInBufferSize = DWORD()
+    lpMaxInstances = DWORD()
+    result = BOOL(GetNamedPipeInfo_Fn(
+        handle, ctypes.byref(lpFlags), ctypes.byref(lpOutBufferSize), ctypes.byref(lpInBufferSize), ctypes.byref(lpMaxInstances)))
+    if result.value == 0:
+        raise WinError(result.value, "GetNamedPipeInfo_Fn", "Failed to write file.")
+
+    return (int(lpFlags.value), int(lpOutBufferSize.value), int(lpInBufferSize.value), int(lpMaxInstances.value))
+
+
+class Win32(object):
+    """
+    Wrapper around win32file and win32pipe in case 'pywin32' is not installed.
+    """
+
+    GENERIC_READ = 0x80000000
+    GENERIC_WRITE = 0x40000000
+    OPEN_EXISTING = 3
+
+    NMPWAIT_WAIT_FOREVER = 0xffffffff
+    NMPWAIT_USE_DEFAULT_WAIT = 0
+    NMPWAIT_NO_WAIT = 1  # todo:jve:Not sure what this is supposed to be
+
+    def __init__(self):
+        self._kernel32 = ctypes.windll.LoadLibrary('kernel32.dll')
+
+        import ctypes.wintypes as wintypes
+        self._wintypes = wintypes
+
+        try:
+            import win32file  # type: ignore[import]
+            import win32pipe  # type: ignore[import]
+
+            self._file = win32file
+            self._pipe = win32pipe
+        except ImportError:
+            self._file = None
+            self._pipe = None
+
+    def ReadFile(self, handle, size):
+        # type: (Handle, int)-> Tuple[int, bytes]
+        return _ReadFile(handle, size)
+
+    def ReadFileBuffer(self, handle, buffer):
+        # type: (Handle, memoryview)-> Tuple[int, bytes]
+        size, data = self.ReadFile(handle, len(buffer))
+        return _ReadFile(handle, len(buffer))
+
+    def WriteFile(self, handle, data):
+        # type: (Handle, Union[str, bytes])-> Tuple[int, int]
+        return _WriteFile(handle, six.ensure_binary(data))
+
+    def CreateFile(
+            self,
+            filename,                   # type: str
+            desired_access=0,           # type: int
+            share_mode=0,               # type: int
+            security_attributes=None,   # type: Optional[Any]
+            creation_disposition=0,     # type: int
+            flags_and_attributes=0,     # type: int
+            __hTemplateFile=None,       # type: Optional[int]
+    ):  # type: (...) -> Handle
+        return _CreateFile(
+            filename, access=desired_access, mode=share_mode, creation=creation_disposition, flags=flags_and_attributes)
+
+    def GetNamedPipeInfo(self, handle):
+        # type: (Handle) -> Tuple[int, int, int, int]
+        return _GetNamedPipeInfo(handle)
+
+    @property
+    def error(self):
+        # type: () -> Type[Exception]
+        if self._pipe:
+            exception = self._pipe.error
+        else:
+            exception = WinError
+        return exception
+
 
 cERROR_PIPE_BUSY = 0xe7
 cSECURITY_SQOS_PRESENT = 0x100000
 cSECURITY_ANONYMOUS = 0
 
 MAXIMUM_RETRY_COUNT = 10
+WIN32_WRAPPER = Win32()
 
 
 def check_closed(f):
@@ -32,9 +275,16 @@ class NpipeSocket(object):
     """
 
     def __init__(self, handle=None):
-        self._timeout = win32pipe.NMPWAIT_USE_DEFAULT_WAIT
-        self._handle = handle
+        # type: (Optional[Any]) -> None
+        self._timeout = WIN32_WRAPPER.NMPWAIT_USE_DEFAULT_WAIT
+        self._handle = HANDLE(handle) if handle else None
         self._closed = False
+
+    @property
+    def handle(self):
+        # type: () -> Handle
+        assert self._handle is not None
+        return self._handle
 
     def accept(self):
         raise NotImplementedError()
@@ -43,25 +293,23 @@ class NpipeSocket(object):
         raise NotImplementedError()
 
     def close(self):
-        self._handle.Close()
+        _CloseHandle(self.handle)
         self._closed = True
 
     @check_closed
     def connect(self, address, retry_count=0):
+        # type: (str, int) -> None
         try:
-            handle = win32file.CreateFile(
+            handle = WIN32_WRAPPER.CreateFile(
                 address,
-                win32file.GENERIC_READ | win32file.GENERIC_WRITE,
-                0,
-                None,
-                win32file.OPEN_EXISTING,
-                cSECURITY_ANONYMOUS | cSECURITY_SQOS_PRESENT,
-                0
+                desired_access=WIN32_WRAPPER.GENERIC_READ | WIN32_WRAPPER.GENERIC_WRITE,
+                creation_disposition=WIN32_WRAPPER.OPEN_EXISTING,
+                flags_and_attributes=cSECURITY_ANONYMOUS | cSECURITY_SQOS_PRESENT
             )
-        except win32pipe.error as e:
+        except Exception as e:
             # See Remarks:
             # https://msdn.microsoft.com/en-us/library/aa365800.aspx
-            if e.winerror == cERROR_PIPE_BUSY:
+            if getattr(e, 'winerror', None) == cERROR_PIPE_BUSY:
                 # Another program or thread has grabbed our pipe instance
                 # before we got to it. Wait for availability and attempt to
                 # connect again.
@@ -71,9 +319,9 @@ class NpipeSocket(object):
                     return self.connect(address, retry_count)
             raise e
 
-        self.flags = win32pipe.GetNamedPipeInfo(handle)[0]
-
         self._handle = handle
+
+        self.flags = WIN32_WRAPPER.GetNamedPipeInfo(self.handle)[0]
         self._address = address
 
     @check_closed
@@ -105,6 +353,7 @@ class NpipeSocket(object):
         raise NotImplementedError()
 
     def makefile(self, mode=None, bufsize=None):
+        assert mode is not None
         if mode.strip('b') != 'r':
             raise NotImplementedError()
         rawio = NpipeFileIOBase(self)
@@ -114,7 +363,8 @@ class NpipeSocket(object):
 
     @check_closed
     def recv(self, bufsize, flags=0):
-        err, data = win32file.ReadFile(self._handle, bufsize)
+        # type: (int, int) -> bytes
+        _err, data = WIN32_WRAPPER.ReadFile(self.handle, bufsize)
         return data
 
     @check_closed
@@ -127,29 +377,19 @@ class NpipeSocket(object):
         return self.recv_into(buf, nbytes, flags), self._address
 
     @check_closed
-    def recv_into(self, buf, nbytes=0):
-        if six.PY2:
-            return self._recv_into_py2(buf, nbytes)
-
-        readbuf = buf
-        if not isinstance(buf, memoryview):
-            readbuf = memoryview(buf)
-
-        err, data = win32file.ReadFile(
-            self._handle,
-            readbuf[:nbytes] if nbytes else readbuf
-        )
-        return len(data)
-
-    def _recv_into_py2(self, buf, nbytes):
-        err, data = win32file.ReadFile(self._handle, nbytes or len(buf))
+    def recv_into(self, buf, nbytes=0, flags=0):
+        # type: (Optional[MutableSequence[int]], int, int) -> int
+        if buf:
+            _err, data = WIN32_WRAPPER.ReadFile(self.handle, nbytes or len(buf))
             n = len(data)
-        buf[:n] = data
+            buf[:n] = data  # type: ignore
+        else:
+            n = 0
         return n
 
     @check_closed
     def send(self, string, flags=0):
-        err, nbytes = win32file.WriteFile(self._handle, string)
+        _err, nbytes = WIN32_WRAPPER.WriteFile(self.handle, string)
         return nbytes
 
     @check_closed
@@ -169,12 +409,12 @@ class NpipeSocket(object):
     def settimeout(self, value):
         if value is None:
             # Blocking mode
-            self._timeout = win32pipe.NMPWAIT_WAIT_FOREVER
+            self._timeout = WIN32_WRAPPER.NMPWAIT_WAIT_FOREVER
         elif not isinstance(value, (float, int)) or value < 0:
             raise ValueError('Timeout value out of range')
         elif value == 0:
             # Non-blocking mode
-            self._timeout = win32pipe.NMPWAIT_NO_WAIT
+            self._timeout = WIN32_WRAPPER.NMPWAIT_NO_WAIT
         else:
             # Timeout mode - Value converted to milliseconds
             self._timeout = value * 1000
@@ -199,6 +439,7 @@ class NpipeFileIOBase(io.RawIOBase):
         self.sock = None
 
     def fileno(self):
+        assert self.sock is not None
         return self.sock.fileno()
 
     def isatty(self):
@@ -208,6 +449,7 @@ class NpipeFileIOBase(io.RawIOBase):
         return True
 
     def readinto(self, buf):
+        assert self.sock is not None
         return self.sock.recv_into(buf)
 
     def seekable(self):
