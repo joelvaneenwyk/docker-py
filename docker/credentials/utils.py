@@ -1,4 +1,3 @@
-import distutils.spawn
 import os
 import sys
 
@@ -9,12 +8,19 @@ def find_executable(executable, path=None):
     every extension declared in PATHEXT instead of just `.exe`
     """
     if sys.platform != 'win32':
+        import warnings
+
+        warnings.filterwarnings("ignore", message="The distutils package is deprecated")
+
+        import distutils.spawn
         return distutils.spawn.find_executable(executable, path)
 
     if path is None:
         path = os.environ['PATH']
 
     paths = path.split(os.pathsep)
+    paths.append("C:\\Program Files\\Docker\\Docker\\resources\\bin")
+    paths.append("C:\\Program Files\\Docker\\Docker")
     extensions = os.environ.get('PATHEXT', '.exe').split(os.pathsep)
     base, ext = os.path.splitext(executable)
 
