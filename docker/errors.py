@@ -8,6 +8,12 @@ class DockerException(Exception):
     If you want to catch all errors that the Docker SDK might raise,
     catch this base exception.
     """
+    def __init__(self, msg=None, *args):
+        self.msg = msg or ''
+        super(DockerException, self).__init__(msg, *args)
+
+    def __str__(self):
+        return self.msg or super(DockerException, self).__str__()
 
 
 def create_api_error_from_http_exception(e):
