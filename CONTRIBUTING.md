@@ -16,9 +16,11 @@ create an issue
 the following information:
 
 - SDK version, Docker version and python version
-```
-pip freeze | grep docker && python --version && docker version
-```
+
+  ```bash
+  pip freeze | grep docker && python --version && docker version
+  ```
+
 - OS, distribution and OS version
 - The issue you're encountering including a stacktrace if applicable
 - If possible, steps or a code snippet to reproduce the issue
@@ -85,51 +87,52 @@ should always be documented.
 If you're ever confused about something pertaining to the project, feel free
 to reach out and ask questions. We will do our best to answer and help out.
 
-
 ## Development environment
 
 If you're looking contribute to Docker SDK for Python but are new to the
 project or Python, here are the steps to get you started.
 
-1. Fork https://github.com/docker/docker-py to your username.
+1. Fork <https://github.com/docker/docker-py> to your username.
 2. Clone your forked repository locally with
-  `git clone git@github.com:yourusername/docker-py.git`.
+   `git clone git@github.com:yourusername/docker-py.git`.
 3. Configure a
-  [remote](https://help.github.com/articles/configuring-a-remote-for-a-fork/)
-  for your fork so that you can
-  [sync changes you make](https://help.github.com/articles/syncing-a-fork/)
-  with the original repository.
+   [remote](https://help.github.com/articles/configuring-a-remote-for-a-fork/)
+   for your fork so that you can
+   [sync changes you make](https://help.github.com/articles/syncing-a-fork/)
+   with the original repository.
 4. Enter the local directory `cd docker-py`.
 5. Run `python setup.py develop` to install the dev version of the project
-  and required dependencies. We recommend you do so inside a
-  [virtual environment](http://docs.python-guide.org/en/latest/dev/virtualenvs)
+   and required dependencies. We recommend you do so inside a
+   [virtual environment](http://docs.python-guide.org/en/latest/dev/virtualenvs)
 
 ## Running the tests & Code Quality
 
 To get the source source code and run the unit tests, run:
-```
-$ git clone git://github.com/docker/docker-py.git
-$ cd docker-py
-$ make test
+
+```bash
+git clone git://github.com/docker/docker-py.git
+cd docker-py
+make test
 ```
 
 ## Building the docs
 
-```
-$ make docs
-$ open _build/index.html
+```bash
+make docs
+open _build/index.html
 ```
 
 ## Release Checklist
 
 Before a new release, please go through the following checklist:
 
-* Bump version in docker/version.py
-* Add a release note in docs/change_log.md
-* Git tag the version
-* Upload to pypi
+- Bump version in `docker/version.py`
+- Add a release note in `docs/change_log.md`
+- Git tag the version
+- Upload to `pypi`
 
 ## Vulnerability Reporting
+
 For any security issues, please do NOT file an issue or pull request on github!
 Please contact [security@docker.com](mailto:security@docker.com) or read [the
 Docker security page](https://www.docker.com/resources/security/).
