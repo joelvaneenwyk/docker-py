@@ -62,16 +62,10 @@
         "-c=${workspaceFolder}/pyproject.toml"
     ],
     "python.testing.pytestArgs": [
-        "--doctest-modules",
-        "--doctest-report",
-        "ndiff",
         "--showlocals",
         "--capture=tee-sys",
         "--verbose",
-        "-c=${workspaceFolder}/pyproject.toml",
-        "-o",
-        "cache_dir=${workspaceFolder}/Obj/Cache/Python/pytest_vscode",
-        "--rootdir=${workspaceFolder}"
+        "-c=${workspaceFolder}/pyproject.toml"
     ],
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": true,

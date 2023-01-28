@@ -41,6 +41,7 @@ import requests.exceptions
 import six
 import websocket  # type: ignore[import]
 
+
 class APIClient(
         requests.Session,
         BuildApiMixin,
