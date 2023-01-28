@@ -125,8 +125,9 @@ class ContainerErrorTest(unittest.TestCase):
         stderr = None
 
         err = ContainerError(container, exit_status, command, image, stderr)
-        msg = "Command '{}' in image '{}' returned non-zero exit status {}\n{}".format(
-            command, image, exit_status, stderr)
+        msg = "Command '{}' in image '{}' returned non-zero exit status {}{}".format(
+            command, image, exit_status,
+            ": {}".format(stderr) if stderr is not None else "")
         assert str(err) == msg
 
     def test_container_with_stderr(self):
@@ -139,8 +140,8 @@ class ContainerErrorTest(unittest.TestCase):
         stderr = "Something went wrong"
 
         err = ContainerError(container, exit_status, command, image, stderr)
-        msg = ("Command '{}' in image '{}' returned non-zero exit status {}: "
-               "{}").format(command, image, exit_status, stderr)
+        msg = "Command '{}' in image '{}' returned non-zero exit status {}: {}".format(
+            command, image, exit_status, stderr)
         assert str(err) == msg
 
 

@@ -23,6 +23,7 @@ class SocketError(Exception):
 
 
 def read(socket, n=4096):
+    # type: (pysocket.socket, int) -> bytes
     """
     Reads at most n bytes from socket
     """
@@ -35,12 +36,14 @@ def read(socket, n=4096):
     try:
         if hasattr(socket, 'recv'):
             return socket.recv(n)
-        if six.PY3 and isinstance(socket, getattr(pysocket, 'SocketIO')):
+        if sys.version_info[0] >= 3 and isinstance(socket, getattr(pysocket, 'SocketIO')):
             return socket.read(n)
         return os.read(socket.fileno(), n)
-    except EnvironmentError as e:
-        if e.errno not in recoverable_errors:
+    except EnvironmentError as environment_error:
+        if environment_error.errno not in recoverable_errors:
             raise
+
+    return six.binary_type()
 
 
 def read_exactly(socket, n):

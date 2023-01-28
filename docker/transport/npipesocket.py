@@ -1,5 +1,4 @@
 import ctypes
-import ctypes.wintypes
 import functools
 import io
 import time
@@ -19,15 +18,7 @@ class WinError(Exception):
         self.funcname = funcname
         self.strerror = strerror
 
-
-LPWSTR = ctypes.wintypes.LPWSTR
-LPCWSTR = ctypes.wintypes.LPCWSTR
-LPCSTR = ctypes.wintypes.LPCSTR
-ULONG = ctypes.wintypes.ULONG
-DWORD = ctypes.wintypes.DWORD
-LPDWORD = ctypes.POINTER(DWORD)
-LPOVERLAPPED = ctypes.wintypes.LPVOID
-LPSECURITY_ATTRIBUTES = ctypes.wintypes.LPVOID
+BOOL = ctypes.c_long
 
 GENERIC_READ = 0x80000000
 GENERIC_WRITE = 0x40000000
@@ -45,12 +36,28 @@ FILE_ATTRIBUTE_NORMAL = 0x00000080
 INVALID_HANDLE_VALUE = -1
 
 NULL = 0
-BOOL = ctypes.wintypes.BOOL
 FALSE = BOOL(0)
 TRUE = BOOL(1)
 
-Handle = ctypes.wintypes.HANDLE
-HANDLE = Handle
+LPVOID = ctypes.c_void_p
+
+LPCOLESTR = LPOLESTR = OLESTR = ctypes.c_wchar_p
+LPCWSTR = LPWSTR = ctypes.c_wchar_p
+LPCSTR = LPSTR = ctypes.c_char_p
+LPCVOID = LPVOID = ctypes.c_void_p
+
+ULONG = ctypes.c_ulong
+LONG = ctypes.c_long
+DWORD = ctypes.c_ulong
+
+LPDWORD = ctypes.POINTER(DWORD)
+HANDLE = ctypes.c_void_p # in the header files: void *
+Handle = HANDLE
+
+try:
+    import ctypes.wintypes
+except ImportError:
+    setattr(ctypes, 'wintypes', None)
 
 
 class _US(ctypes.Structure):
@@ -81,25 +88,32 @@ class OVERLAPPED(ctypes.Structure):
     _anonymous_ = ("u",)
 
 
-ReadFile = ctypes.windll.kernel32.ReadFile  # type: ignore[attr-defined]
-ReadFile.argtypes = (HANDLE, ctypes.c_void_p, DWORD, ctypes.POINTER(DWORD), ctypes.POINTER(OVERLAPPED))
-ReadFile.restype = BOOL
+try:
+    ReadFile = ctypes.windll.kernel32.ReadFile  # type: ignore[attr-defined]
+    ReadFile.argtypes = (HANDLE, ctypes.c_void_p, DWORD, ctypes.POINTER(DWORD), ctypes.POINTER(OVERLAPPED))
+    ReadFile.restype = BOOL
 
-WriteFile = ctypes.windll.kernel32.WriteFile  # type: ignore[attr-defined]
-WriteFile.argtypes = (HANDLE, ctypes.c_void_p, DWORD, ctypes.POINTER(DWORD), ctypes.POINTER(OVERLAPPED))
-WriteFile.restype = BOOL
+    WriteFile = ctypes.windll.kernel32.WriteFile  # type: ignore[attr-defined]
+    WriteFile.argtypes = (HANDLE, ctypes.c_void_p, DWORD, ctypes.POINTER(DWORD), ctypes.POINTER(OVERLAPPED))
+    WriteFile.restype = BOOL
 
-CreateFileA = ctypes.windll.kernel32.CreateFileA  # type: ignore[attr-defined]
-CreateFileA.argtypes = (LPCSTR, DWORD, DWORD, ctypes.c_void_p, DWORD, DWORD, HANDLE)
-CreateFileA.restype = HANDLE
+    CreateFileA = ctypes.windll.kernel32.CreateFileA  # type: ignore[attr-defined]
+    CreateFileA.argtypes = (LPCSTR, DWORD, DWORD, ctypes.c_void_p, DWORD, DWORD, HANDLE)
+    CreateFileA.restype = HANDLE
 
-CreateFileW = ctypes.windll.kernel32.CreateFileW  # type: ignore[attr-defined]
-CreateFileW.argtypes = (LPCWSTR, DWORD, DWORD, ctypes.c_void_p, DWORD, DWORD, HANDLE)
-CreateFileW.restype = HANDLE
+    CreateFileW = ctypes.windll.kernel32.CreateFileW  # type: ignore[attr-defined]
+    CreateFileW.argtypes = (LPCWSTR, DWORD, DWORD, ctypes.c_void_p, DWORD, DWORD, HANDLE)
+    CreateFileW.restype = HANDLE
 
-CloseHandle = ctypes.windll.kernel32.CloseHandle  # type: ignore[attr-defined]
-CloseHandle.argtypes = (HANDLE,)
-CloseHandle.restype = BOOL
+    CloseHandle = ctypes.windll.kernel32.CloseHandle  # type: ignore[attr-defined]
+    CloseHandle.argtypes = (HANDLE,)
+    CloseHandle.restype = BOOL
+except AttributeError:
+    ReadFile = None
+    WriteFile = None
+    CreateFileA = None
+    CreateFileW = None
+    CloseHandle = None
 
 
 def _CloseHandle(handle):
@@ -193,10 +207,17 @@ class Win32(object):
     NMPWAIT_NO_WAIT = 1  # todo:jve:Not sure what this is supposed to be
 
     def __init__(self):
-        self._kernel32 = ctypes.windll.LoadLibrary('kernel32.dll')
+        try:
+            self._kernel32 = ctypes.windll.LoadLibrary('kernel32.dll')
+        except AttributeError:
+            self._kernel32 = None
 
-        import ctypes.wintypes as wintypes
-        self._wintypes = wintypes
+        try:
+            import ctypes.wintypes as wintypes
+
+            self._wintypes = wintypes
+        except AttributeError:
+            self._wintypes = None
 
         try:
             import win32file  # type: ignore[import]

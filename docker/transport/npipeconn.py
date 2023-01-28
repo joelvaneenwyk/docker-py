@@ -1,12 +1,10 @@
-from docker.transport.basehttpadapter import BaseHTTPAdapter
+import sys
 
 from .. import constants
+from .basehttpadapter import BaseHTTPAdapter
 from .npipesocket import NpipeSocket
 
-import requests.adapters
-import six
-
-if six.PY3:
+if sys.version_info[0] >= 3:
     import http.client as httplib
 else:
     import httplib
@@ -15,6 +13,9 @@ try:
     import requests.packages.urllib3 as urllib3  # type: ignore[import]
 except ImportError:
     import urllib3  # type: ignore
+
+import requests.adapters
+import six
 
 RecentlyUsedContainer = urllib3._collections.RecentlyUsedContainer
 

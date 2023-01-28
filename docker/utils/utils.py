@@ -22,8 +22,15 @@ if sys.version_info[0] >= 3:
     import warnings
 
     warnings.filterwarnings("ignore", message="The distutils package is deprecated")
+    warnings.filterwarnings("ignore", message="distutils Version classes are deprecated")
 
-from distutils.version import StrictVersion
+try:
+    from packaging.version import parse
+except ImportError:
+    from distutils.version import StrictVersion
+
+    def parse(version):
+        return StrictVersion(version)
 
 
 def create_ipam_pool(*args, **kwargs):
@@ -59,8 +66,8 @@ def compare_version(v1, v2):
     >>> compare_version(v2, v2)
     0
     """
-    s1 = StrictVersion(v1)
-    s2 = StrictVersion(v2)
+    s1 = parse(v1)
+    s2 = parse(v2)
     if s1 == s2:
         return 0
     elif s1 > s2:
