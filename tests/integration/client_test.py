@@ -10,7 +10,12 @@ from .base import TEST_API_VERSION
 
 
 class ClientTest(unittest.TestCase):
-    client = docker.from_env(version=TEST_API_VERSION)
+    client = None
+
+    def __init__(self, *args, **kwargs):
+        super(ClientTest, self).__init__(*args, **kwargs)
+        if self.client is None:
+            self.client = docker.from_env(version=TEST_API_VERSION)
 
     def test_info(self):
         info = self.client.info()
@@ -33,7 +38,12 @@ class ClientTest(unittest.TestCase):
 
 
 class CancellableEventsTest(unittest.TestCase):
-    client = docker.from_env(version=TEST_API_VERSION)
+    client = None
+
+    def __init__(self, *args, **kwargs):
+        super(CancellableEventsTest, self).__init__(*args, **kwargs)
+        if self.client is None:
+            self.client = docker.from_env(version=TEST_API_VERSION)
 
     def test_cancel_events(self):
         start = datetime.now()

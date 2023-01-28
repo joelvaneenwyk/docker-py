@@ -40,11 +40,16 @@ extensions = [
 templates_path = ['_templates']
 
 
-from recommonmark.parser import CommonMarkParser
+source_parsers = {}
 
-source_parsers = {
-    '.md': CommonMarkParser,
-}
+try:
+    from recommonmark.parser import CommonMarkParser
+
+    source_parsers = {
+        '.md': CommonMarkParser,
+    }
+except ImportError:
+    pass
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -69,8 +74,14 @@ author = u'Docker Inc'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-with open('../docker/version.py', 'r') as vfile:
-    exec(vfile.read())
+
+try:
+    with open('../docker/version.py', 'r') as vfile:
+        exec(vfile.read())
+except IOError:
+    version_info = (0, 0, 0, 'unknown')
+    version = '.'.join((str(x) for x in version_info))
+
 # The full version, including alpha/beta/rc tags.
 release = version
 # The short X.Y version.
