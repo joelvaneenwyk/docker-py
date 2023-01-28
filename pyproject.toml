@@ -68,19 +68,13 @@ sections = [
     "FUTURE",
     # standard library
     "STDLIB",
-    # initialization
-    "INIT",
+    # first party items
+    "FIRSTPARTY",
     # local folder
     "LOCALFOLDER",
+    # third party packages
+    "THIRDPARTY",
 ]
 
-known_init = ["__init__"]
-known_local_folder = [
-    "api",
-    "context",
-    "credentials",
-    "models",
-    "transport",
-    "types",
-    "utils",
-]
+known_first_party = ["docker"]
+known_third_party = ["six", "requests", "pytest", "websocket"]
