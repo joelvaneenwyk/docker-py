@@ -8,6 +8,8 @@ dist
 # pyenv
 .python-version
 
+sh_bin.tar
+
 .tox
 .coverage
 html/*
@@ -19,3 +21,5 @@ README.rst
 env/
 venv/
 .idea/
+
+docker/_version.py

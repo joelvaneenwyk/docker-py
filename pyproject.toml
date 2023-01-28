@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+
+[tool.setuptools_scm]
+write_to = 'docker/_version.py'
+
+[tool.distutils.bdist_wheel]
+universal = 1
+
+[project]
+name = "docker"
+
+description = "A Python library for the Docker Engine API."
+readme.file = "README.md"
+readme.content-type = "text/markdown"
+license.file = "LICENSE"
+requires-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.6.*"
+version = "0.4.4"
+
+dependencies = [
+    "appdirs>=1.4.3",
+    "asn1crypto>=0.22.0",
+    "backports.ssl-match-hostname>=3.5.0.1",
+    "cffi>=1.14.4",
+    "cryptography>=3.2",
+    "enum34>=1.1.6",
+    "idna>=2.5",
+    "ipaddress>=1.0.18",
+    "packaging>=16.8",
+    "paramiko>=2.4.2",
+    "pycparser>=2.17",
+    "pyOpenSSL>=18.0.0",
+    "pyparsing>=2.2.0",
+    "pywin32>=227; sys_platform == 'win32'",
+    "requests>=2.20.0",
+    "six>=1.16.0",
+    "urllib3>=1.24.3",
+    "websocket-client>=0.56.0",
+]
+
+optional-dependencies.docs = ["recommonmark>=0.4.0", "Sphinx>=1.4.6"]
+
+optional-dependencies.test = [
+    # last version with python 2.7 support
+    "setuptools>=44.0.0",
+    "coverage>=4.5.2",
+    "flake8>=3.6.0",
+    "mock>=1.0.1",
+    "pytest>=4.3.1",
+    "pytest-cov>=2.6.1",
+    "pytest-timeout>=1.3.3",
+]
+
+################################################
+[tool.isort]
+################################################
+
+py_version = "all"
+multi_line_output = 4
+lines_after_imports = -1
+line_length = 130
+force_single_line = false
+length_sort = false
+from_first = false
+force_alphabetical_sort_within_sections = true
+sections = [
+    # __future__ imports
+    "FUTURE",
+    # standard library
+    "STDLIB",
+    # initialization
+    "INIT",
+    # local folder
+    "LOCALFOLDER",
+]
+
+known_init = ["__init__"]
+known_local_folder = [
+    "api",
+    "context",
+    "credentials",
+    "models",
+    "transport",
+    "types",
+    "utils",
+]
