@@ -17,10 +17,10 @@ setlocal EnableDelayedExpansion
     :RunPython
     call "%~dp0py.bat" -m pip install --user ^
         tox wheel setuptools twine poetry ^
-        flake8 pytest pytest-timeout pytest-xdist ^
+        flake8 pytest pytest-timeout pytest-xdist mypy isort ^
         six requests websocket ^
         paramiko ^
-        types-six
+        types-six types-urllib3 types-requests types-paramiko
 endlocal & (
     set "PATH=%PATH%"
 )

@@ -32,7 +32,7 @@
     "python.analysis.inlayHints.variableTypes": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.linting.enabled": true,
-    "python.linting.flake8Args": ["--config", "${workspaceFolder}/setup.cfg"],
+    "python.linting.flake8Args": ["--config", "${workspaceFolder}/tox.ini"],
     "python.linting.flake8Enabled": true,
     "python.linting.mypyArgs": [
         "--no-pretty",
@@ -40,7 +40,7 @@
         "${workspaceFolder}/pyproject.toml"
     ],
     "python.linting.mypyEnabled": true,
-    "python.linting.pycodestyleArgs": ["--config=${workspaceFolder}/setup.cfg"],
+    "python.linting.pycodestyleArgs": ["--config=${workspaceFolder}/tox.ini"],
     "python.linting.pycodestyleEnabled": false,
     "python.linting.pydocstyleEnabled": false,
     "python.linting.pylintEnabled": true,
@@ -74,5 +74,6 @@
         "--rootdir=${workspaceFolder}"
     ],
     "python.testing.pytestEnabled": true,
-    "python.testing.unittestEnabled": true
+    "python.testing.unittestEnabled": true,
+    "cSpell.words": ["Npipe", "pysocket", "redef"]
 }
