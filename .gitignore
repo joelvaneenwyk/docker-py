@@ -12,6 +12,7 @@ sh_bin.tar
 
 .tox
 .coverage
+.coverage.*
 html/*
 
 # Compiled Documentation
