@@ -9,14 +9,12 @@ universal = 1
 
 [project]
 name = "docker"
-
 description = "A Python library for the Docker Engine API."
 readme.file = "README.md"
 readme.content-type = "text/markdown"
 license.file = "LICENSE"
 requires-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.6.*"
 version = "0.4.4"
-
 dependencies = [
     "appdirs>=1.4.3",
     "asn1crypto>=0.22.0",
@@ -37,12 +35,11 @@ dependencies = [
     "urllib3>=1.24.3",
     "websocket-client>=0.56.0",
 ]
-
 optional-dependencies.docs = ["recommonmark>=0.4.0", "Sphinx>=1.4.6"]
-
 optional-dependencies.test = [
-    # last version with python 2.7 support
+    # This is the last version with python 2.7 support
     "setuptools>=44.0.0",
+
     "coverage>=4.5.2",
     "flake8>=3.6.0",
     "mock>=1.0.1",
@@ -51,6 +48,36 @@ optional-dependencies.test = [
     "pytest-cov>=2.6.1",
     "pytest-timeout>=1.3.3",
 ]
+
+################################################
+[tool.poetry]
+################################################
+
+name = "docker"
+version = "0.4.4"
+description = ""
+authors = ["Sébastien Eustace <sebastien@eustace.io>"]
+
+[tool.poetry.dependencies]
+python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.6.*"
+appdirs = ">=1.4.3"
+asn1crypto = ">=0.22.0"
+backports-ssl-match-hostname = ">=3.5.0.1"
+cffi = ">=1.14.4"
+cryptography = ">=3.2"
+enum34 = ">=1.1.6"
+idna = ">=2.5"
+ipaddress = ">=1.0.18"
+packaging = ">=16.8"
+paramiko = ">=2.4.2"
+pycparser = ">=2.17"
+pyOpenSSL = ">=18.0.0"
+pyparsing = ">=2.2.0"
+pywin32 = ">=227"
+requests = ">=2.20.0"
+six = ">=1.16.0"
+urllib3 = ">=1.24.3"
+websocket-client = ">=0.56.0"
 
 ################################################
 [tool.isort]
