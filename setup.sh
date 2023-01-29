@@ -1,15 +1,31 @@
-#!/bin/sh
+#!/bin/bash
+
+_sudo() {
+    if [ -x "$(command -v apt-get)" ]; then
+        sudo "$@"
+    else
+        "$@"
+    fi
+}
+
+_sudo chown vscode .tox
 
 if [ -x "$(command -v apt-get)" ]; then
-    if sudo apt-get update; then
-        sudo apt-get install -y --no-install-recommends rsync
+    if _sudo apt-get update; then
+        _sudo apt-get install -y --no-install-recommends rsync
     fi
 fi
 
 if [ ! -x "$(command -v pyenv)" ]; then
     # curl https://pyenv.run | bash
-    git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-    cd ~/.pyenv && src/configure && make -C src
+    if [ ! -e "$HOME/.pyenv" ]; then
+        git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+        (
+            cd ~/.pyenv || true
+            src/configure
+            make -C src
+        )
+    fi
 
     # shellcheck disable=SC2016
     {
@@ -24,9 +40,10 @@ if [ ! -x "$(command -v pyenv)" ]; then
 fi
 
 if [ -x "$(command -v pyenv)" ]; then
-    pyenv install --skip-existing 2.7.18 3.10.9
-    pyenv local 3.10.9 2.7.18
-    pyenv shell 3.10.9 2.7.18
+    versions=("3.10.9" "2.7.18" "3.9.16" "pypy3.9-7.3.11" "3.11.1" "3.8.16" "3.7.16")
+    pyenv install --skip-existing "${versions[@]}"
+    pyenv local "${versions[@]}"
+    pyenv shell "${versions[@]}"
 fi
 
 if [ ! -x "$(command -v poetry)" ]; then
@@ -35,7 +52,9 @@ fi
 
 if [ -x "$(command -v poetry)" ]; then
     poetry install --only main
-else
+fi
+
+if [ -x "$(command -v python3)" ]; then
     python3 -m pip install \
         --user --no-warn-script-location \
         tox wheel setuptools twine poetry \

@@ -14,6 +14,11 @@
         "cSpell.advanced.feature.useReferenceProviderWithRename": true,
         "cSpell.advanced.feature.useReferenceProviderRemove": "/^#+\\s/"
     },
+    "files.associations": {
+        "Dockerfile*": "dockerfile",
+        ".coveragerc": "ini",
+        "MANIFEST*": "automake"
+    },
     "taskExplorer.enabledTasks": {
         "ant": false,
         "appPublisher": false,
