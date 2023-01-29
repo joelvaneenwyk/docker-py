@@ -8,7 +8,10 @@
     "features": {
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
         "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/python:1": {},
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.10",
+            "optimize": true
+        },
         "ghcr.io/devcontainers/features/sshd:1": {},
         "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {},
         "ghcr.io/devcontainers-contrib/features/act-asdf:2": {},
@@ -28,8 +31,9 @@
         "ghcr.io/dhoeric/features/act:1": {},
         "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
         "ghcr.io/lukewiwa/features/shellcheck:0": {},
-        "ghcr.io/withfig/features/fig:1": {}
+        "ghcr.io/withfig/features/fig:1": {},
+        "ghcr.io/oleksis/devcontainer-features/python-launcher:1": {}
     },
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "pip3 install --user -r requirements.txt"
+    "postCreateCommand": "./setup.sh"
 }
