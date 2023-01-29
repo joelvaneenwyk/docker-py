@@ -1,11 +1,21 @@
 import errno
 import os
 import select
-import socket as pysocket
 import struct
 import sys
 
 import six
+
+try:
+    from typing import Optional, Union  # noqa
+except ImportError:
+    pass
+
+try:
+    from socket import socket as Socket
+    from socket import SocketIO
+except ImportError:
+    pass
 
 try:
     from ..transport import NpipeSocket  # type: ignore
@@ -19,11 +29,19 @@ STDERR = 2
 
 
 class SocketError(Exception):
+    """Socket specific exception."""
     pass
 
 
+NPIPE_ENDED = 109
+"""
+NpipeSockets have their own error types
+pywintypes.error: (109, 'ReadFile', 'The pipe has been ended.')
+"""
+
+
 def read(socket, n=4096):
-    # type: (pysocket.socket, int) -> bytes
+    # type: (Union[NpipeSocket, Socket, SocketIO], int) -> Optional[bytes]
     """
     Reads at most n bytes from socket
     """
@@ -31,19 +49,32 @@ def read(socket, n=4096):
     recoverable_errors = (errno.EINTR, errno.EDEADLK, errno.EWOULDBLOCK)
 
     if sys.version_info[0] >= 3 and not isinstance(socket, NpipeSocket):
-        select.select([socket], [], [])
+        try:
+            select.select([socket], [], [])
+        except ValueError:
+            return six.binary_type(0)
 
     try:
         if hasattr(socket, 'recv'):
             return socket.recv(n)
-        if sys.version_info[0] >= 3 and isinstance(socket, getattr(pysocket, 'SocketIO')):
+        if sys.version_info[0] >= 3 and isinstance(socket, SocketIO):
             return socket.read(n)
         return os.read(socket.fileno(), n)
-    except EnvironmentError as environment_error:
-        if environment_error.errno not in recoverable_errors:
+    except OSError as os_error:
+        if os_error.errno not in recoverable_errors:
             raise
+    except Exception as exception:
+        is_pipe_ended = (
+            isinstance(socket, NpipeSocket)
+            and len(exception.args) > 0
+            and exception.args[0] == NPIPE_ENDED)
+        if is_pipe_ended:
+            # npipes don't support duplex sockets, so we interpret
+            # a PIPE_ENDED error as a close operation (0-length read).
+            return six.binary_type(0)
+        raise
 
-    return six.binary_type()
+    return six.binary_type(0)
 
 
 def read_exactly(socket, n):
