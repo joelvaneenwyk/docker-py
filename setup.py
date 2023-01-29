@@ -41,9 +41,6 @@ extras_require = {
 
 }
 
-version = None
-exec(open(os.path.join(ROOT_DIR, 'docker', 'version.py')).read())
-
 with open(os.path.join(ROOT_DIR, 'requirements-test.txt')) as test_reqs_txt:
     test_requirements = [line for line in test_reqs_txt]
 
@@ -53,7 +50,9 @@ with codecs.open(os.path.join(ROOT_DIR, 'README.md'), encoding='utf-8') as readm
 
 setup(
     name="docker",
-    version=version or '0.0.0',
+    use_scm_version={
+        'write_to': 'docker/_version.py'
+    },
     description="A Python library for the Docker Engine API.",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -65,6 +64,7 @@ setup(
         'Tracker': 'https://github.com/docker/docker-py/issues',
     },
     packages=find_packages(exclude=["tests.*", "tests"]),
+    setup_requires=['setuptools_scm'],
     install_requires=requirements,
     tests_require=test_requirements,
     extras_require=extras_require,
@@ -83,10 +83,12 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Software Development',
         'Topic :: Utilities',
         'License :: OSI Approved :: Apache Software License',
     ],
-    maintainer='Joffrey F',
-    maintainer_email='joffrey@docker.com',
+    maintainer='Ulysses Souza',
+    maintainer_email='ulysses.souza@docker.com',
 )

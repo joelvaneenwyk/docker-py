@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 ARG PYTHON_VERSION=2.7
 
 FROM python:${PYTHON_VERSION}
@@ -10,10 +12,11 @@ RUN mkdir /src
 WORKDIR /src
 
 COPY requirements.txt /src/requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY requirements-test.txt /src/requirements-test.txt
-RUN pip install -r requirements-test.txt
+RUN pip install --no-cache-dir -r requirements-test.txt
 
 COPY . /src
-RUN pip install .
+ARG SETUPTOOLS_SCM_PRETEND_VERSION_DOCKER
+RUN pip install --no-cache-dir .

@@ -4,6 +4,7 @@ dist
 *.egg/
 *.pyc
 *.swp
+.eggs/
 
 # pyenv
 .python-version
