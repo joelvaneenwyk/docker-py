@@ -1,7 +1,7 @@
 import requests
 
 try:
-    from typing import Any, Optional
+    from typing import Any, Optional  # noqa
 except ImportError:
     pass
 

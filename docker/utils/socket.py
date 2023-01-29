@@ -8,7 +8,7 @@ import sys
 import six
 
 try:
-    from ..transport import NpipeSocket
+    from ..transport import NpipeSocket  # type: ignore
 except ImportError:
     class NpipeSocket(object):  # type: ignore[no-redef]
         pass
