@@ -1,3 +1,4 @@
+import sys
 import datetime
 import io
 import json
@@ -497,7 +498,10 @@ class TCPSocketStreamTest(unittest.TestCase):
         cls.server = six.moves.socketserver.ThreadingTCPServer(
             ('', 0), cls.get_handler_class())
         cls.thread = threading.Thread(target=cls.server.serve_forever)
-        cls.thread.setDaemon(True)
+        if sys.version_info[0] >= 3:
+            cls.thread.daemon = True
+        else:
+            cls.thread.setDaemon(True)  # pylint: disable=deprecated-method
         cls.thread.start()
         cls.address = 'http://{}:{}'.format(
             socket.gethostname(), cls.server.server_address[1])
