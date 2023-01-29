@@ -1,10 +1,11 @@
 version: 2
 
 sphinx:
-    configuration: docs/conf.py
+  configuration: docs/conf.py
+  language: en
 
 python:
-    version: 3.5
-    install:
-        - requirements: requirements-docs.txt
-        - requirements: requirements.txt
+  version: "3.7"
+  install:
+    - requirements: requirements-docs.txt
+    - requirements: requirements.txt

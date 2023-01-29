@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=44.1.1", "setuptools_scm[toml]"]
 
 [tool.setuptools_scm]
 write_to = 'docker/_version.py'

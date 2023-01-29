@@ -15,6 +15,7 @@ sh_bin.tar
 .coverage
 .coverage.*
 html/*
+.tmp/
 
 # Compiled Documentation
 _build/

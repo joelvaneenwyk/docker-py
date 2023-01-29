@@ -66,9 +66,9 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = u'Docker SDK for Python'
+project = 'Docker SDK for Python'
 year = datetime.datetime.now().year
-copyright = u'%d Docker Inc' % year
+copyright = '%d Docker Inc' % year
 author = u'Docker Inc'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -93,7 +93,7 @@ version = '{}.{}'.format(version_info[0], version_info[1])
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
