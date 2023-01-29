@@ -32,7 +32,7 @@ if [[ $2 == 'upload' ]]; then
 fi
 
 echo "##> sdist & wheel"
-python setup.py sdist bdist_wheel
+python -m hatch build
 
 if [[ $2 == 'upload' ]]; then
     echo '##> Uploading sdist to pypi'
