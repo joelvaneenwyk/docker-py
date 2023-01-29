@@ -2,7 +2,6 @@ version: 2
 
 sphinx:
   configuration: docs/conf.py
-  language: en
 
 python:
   version: "3.7"
