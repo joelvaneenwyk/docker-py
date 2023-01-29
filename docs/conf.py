@@ -40,7 +40,6 @@ extensions = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-
 source_parsers = {}
 
 try:
@@ -372,7 +371,6 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
-
 
 # Napoleon settings
 napoleon_google_docstring = True

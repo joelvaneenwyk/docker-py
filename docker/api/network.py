@@ -25,7 +25,6 @@ class NetworkApiMixin(object):
             :py:class:`docker.errors.APIError`
                 If the server returns an error.
         """
-
         if filters is None:
             filters = {}
         if names:

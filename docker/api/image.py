@@ -30,7 +30,6 @@ class ImageApiMixin(object):
                 If the server returns an error.
 
         Example:
-
             >>> image = cli.get_image("busybox:latest")
             >>> f = open('/tmp/busybox-latest.tar', 'wb')
             >>> for chunk in image:
