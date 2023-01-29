@@ -51,6 +51,7 @@
         "--settings-path=pyproject.toml"
     ],
     "python.languageServer": "Pylance",
+    "python.defaultInterpreterPath": "~/.pyenv/shims/python",
     "python.terminal.activateEnvironment": true,
     "python.terminal.activateEnvInCurrentTerminal": true,
     "python.terminal.launchArgs": [],
@@ -123,8 +124,20 @@
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": true,
     "cSpell.words": [
+        "devcontainer",
+        "devcontainers",
+        "dhoeric",
+        "isort",
+        "lukewiwa",
+        "mypy",
         "Npipe",
+        "oleksis",
+        "pipenv",
+        "pylint",
         "pysocket",
-        "redef"
+        "redef",
+        "shellcheck",
+        "stuartleeks",
+        "withfig"
     ]
 }

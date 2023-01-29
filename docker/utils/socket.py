@@ -12,7 +12,7 @@ except ImportError:
     pass
 
 try:
-    from socket import socket as Socket
+    from socket import socket as Socket  # noqa
     from socket import SocketIO
 except ImportError:
     pass
