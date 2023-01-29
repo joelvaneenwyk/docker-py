@@ -15,7 +15,7 @@ setlocal EnableDelayedExpansion
     set "PATH=%PATH%;C:\ProgramData\chocolatey\bin"
 
     :RunPython
-    call "%~dp0py.bat" -m pip install --user ^
+    call "%~dp0py.bat" -m pip install --user --no-warn-script-location ^
         tox wheel setuptools twine poetry ^
         flake8 pytest pytest-timeout pytest-xdist mypy isort pylint ^
         six requests websocket ^

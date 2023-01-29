@@ -1,5 +1,15 @@
-TEST_API_VERSION ?= 1.39
-TEST_ENGINE_VERSION ?= 19.03.13
+TEST_API_VERSION ?= 1.41
+TEST_ENGINE_VERSION ?= 20.10
+
+ifeq ($(OS),Windows_NT)
+    PLATFORM := Windows
+else
+    PLATFORM := $(shell sh -c 'uname -s 2>/dev/null || echo Unknown')
+endif
+
+ifeq ($(PLATFORM),Linux)
+	uid_args := "--build-arg uid=$(shell id -u) --build-arg gid=$(shell id -g)"
+endif
 
 .PHONY: all
 all: test
@@ -15,15 +25,29 @@ build:
 
 .PHONY: build-dind-ssh
 build-dind-ssh:
-	docker build -t docker-dind-ssh -f tests/Dockerfile-ssh-dind --build-arg ENGINE_VERSION=${TEST_ENGINE_VERSION} --build-arg API_VERSION=${TEST_API_VERSION} --build-arg APT_MIRROR .
+	docker build \
+		--pull \
+		-t docker-dind-ssh \
+		-f tests/Dockerfile-ssh-dind \
+		--build-arg ENGINE_VERSION=${TEST_ENGINE_VERSION} \
+		--build-arg API_VERSION=${TEST_API_VERSION} \
+		--build-arg APT_MIRROR .
 
 .PHONY: build-py3
 build-py3:
-	docker build -t docker-sdk-python3 -f tests/Dockerfile --build-arg APT_MIRROR .
+	docker build \
+		--pull \
+		-t docker-sdk-python3 \
+		-f tests/Dockerfile \
+		--build-arg APT_MIRROR .
 
 .PHONY: build-docs
 build-docs:
-	docker build -t docker-sdk-python-docs -f Dockerfile-docs --build-arg uid=$(shell id -u) --build-arg gid=$(shell id -g) .
+	docker build \
+        -t docker-sdk-python-docs \
+        -f Dockerfile-docs \
+        --build-arg uid=$(shell id -u) \
+        --build-arg gid=$(shell id -g) .
 
 .PHONY: build-dind-certs
 build-dind-certs:
