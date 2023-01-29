@@ -8,7 +8,7 @@ _sudo() {
     fi
 }
 
-_sudo chown vscode .tox
+_sudo chown vscode .tox || true
 
 if [ -x "$(command -v apt-get)" ]; then
     if _sudo apt-get update; then
@@ -16,7 +16,9 @@ if [ -x "$(command -v apt-get)" ]; then
     fi
 fi
 
-if [ ! -x "$(command -v pyenv)" ]; then
+if [ -x "$(command -v pyenv)" ]; then
+    echo "Found 'pyenv' installation: $(command -v pyenv)"
+else
     # curl https://pyenv.run | bash
     if [ ! -e "$HOME/.pyenv" ]; then
         git clone https://github.com/pyenv/pyenv.git ~/.pyenv
@@ -37,6 +39,7 @@ if [ ! -x "$(command -v pyenv)" ]; then
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init -)"
+    echo "Initialized 'pyenv' environment: '${PYENV_ROOT}'"
 fi
 
 if [ -x "$(command -v pyenv)" ]; then
