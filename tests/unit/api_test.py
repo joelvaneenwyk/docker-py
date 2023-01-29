@@ -6,6 +6,7 @@ import re
 import shutil
 import socket
 import struct
+import sys
 import tempfile
 import threading
 import time
@@ -20,7 +21,7 @@ from . import fake_api
 import pytest
 import requests
 import six
-from requests.packages import urllib3
+from requests.packages import urllib3  # type: ignore[import]
 
 try:
     from unittest import mock
@@ -383,7 +384,10 @@ class UnixSocketStreamTest(unittest.TestCase):
         self.server_socket = self._setup_socket()
         self.stop_server = False
         server_thread = threading.Thread(target=self.run_server)
-        server_thread.setDaemon(True)
+        if sys.version_info[0] >= 3:
+            server_thread.daemon = True
+        else:
+            server_thread.setDaemon(True)  # pylint: disable=deprecated-method
         server_thread.start()
         self.response = None
         self.request_handler = None

@@ -23,14 +23,17 @@ if sys.version_info[0] >= 3:
 
     warnings.filterwarnings("ignore", message="The distutils package is deprecated")
     warnings.filterwarnings("ignore", message="distutils Version classes are deprecated")
+    warnings.filterwarnings("ignore", message="urllib.parse.splitnport() is deprecated as of 3.8")
 
 try:
-    from packaging.version import parse
+    from packaging.version import Version as StrictVersion  # type: ignore
 except ImportError:
-    from distutils.version import StrictVersion
+    from distutils.version import StrictVersion  # pylint: disable=deprecated-module
 
-    def parse(version):
-        return StrictVersion(version)
+try:
+    from typing import List, Text  # noqa
+except ImportError:
+    pass
 
 
 def create_ipam_pool(*args, **kwargs):
@@ -66,8 +69,8 @@ def compare_version(v1, v2):
     >>> compare_version(v2, v2)
     0
     """
-    s1 = parse(v1)
-    s2 = parse(v2)
+    s1 = StrictVersion(v1)
+    s2 = StrictVersion(v2)
     if s1 == s2:
         return 0
     elif s1 > s2:
@@ -478,7 +481,8 @@ def parse_env_file(env_file):
 
 
 def split_command(command):
-    if six.PY2 and not isinstance(command, six.binary_type):
+    # type: (Text) -> List[Text]
+    if sys.version_info[0] == 2 and not isinstance(command, six.binary_type):
         command = command.encode('utf-8')
     return shlex.split(command)
 
