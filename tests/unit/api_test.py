@@ -39,7 +39,12 @@ def response(status_code=200, content='', headers=None, reason=None, elapsed=0,
     if not isinstance(content, six.binary_type):
         content = json.dumps(content).encode('ascii')
     res._content = content
-    res.headers = requests.structures.CaseInsensitiveDict(headers or {})
+
+    output_headers = dict(headers or {})
+    if 'X-Meta-Source-Client' in output_headers:
+        del output_headers['X-Meta-Source-Client']
+    res.headers = requests.structures.CaseInsensitiveDict(output_headers)
+
     res.reason = reason
     res.elapsed = datetime.timedelta(elapsed)
     res.request = request
@@ -64,7 +69,9 @@ def fake_resp(method, url, *args, **kwargs):
     if not key:
         raise Exception('{0} {1}'.format(method, url))
     status_code, content = fake_api.fake_responses[key]()
-    return response(status_code=status_code, content=content)
+    return response(
+        status_code, content,
+        headers=kwargs.get('headers', None))
 
 
 fake_request = mock.Mock(side_effect=fake_resp)
@@ -135,20 +142,20 @@ class DockerApiTest(BaseAPIClientTest):
 
     def test_url_valid_resource(self):
         url = self.client._url('/hello/{0}/world', 'somename')
-        assert url == '{0}{1}'.format(url_prefix, 'hello/somename/world')
+        assert url == '{}{}'.format(url_prefix, 'hello/somename/world')
 
         url = self.client._url(
             '/hello/{0}/world/{1}', 'somename', 'someothername'
         )
-        assert url == '{0}{1}'.format(
+        assert url == '{}{}'.format(
             url_prefix, 'hello/somename/world/someothername'
         )
 
         url = self.client._url('/hello/{0}/world', 'some?name')
-        assert url == '{0}{1}'.format(url_prefix, 'hello/some%3Fname/world')
+        assert url == '{}{}'.format(url_prefix, 'hello/some%3Fname/world')
 
         url = self.client._url("/images/{0}/push", "localhost:5000/image")
-        assert url == '{0}{1}'.format(
+        assert url == '{}{}'.format(
             url_prefix, 'images/localhost:5000/image/push'
         )
 
@@ -158,13 +165,13 @@ class DockerApiTest(BaseAPIClientTest):
 
     def test_url_no_resource(self):
         url = self.client._url('/simple')
-        assert url == '{0}{1}'.format(url_prefix, 'simple')
+        assert url == '{}{}'.format(url_prefix, 'simple')
 
     def test_url_unversioned_api(self):
         url = self.client._url(
             '/hello/{0}/world', 'somename', versioned_api=False
         )
-        assert url == '{0}{1}'.format(url_base, 'hello/somename/world')
+        assert url == '{}{}'.format(url_base, 'hello/somename/world')
 
     def test_version(self):
         self.client.version()
@@ -323,7 +330,7 @@ class DockerApiTest(BaseAPIClientTest):
 
         fake_request.assert_called_with(
             'DELETE',
-            url_prefix + 'containers/3cc2351ab11b',
+            url_prefix + 'containers/' + fake_api.FAKE_CONTAINER_ID,
             params={'v': False, 'link': True, 'force': False},
             timeout=DEFAULT_TIMEOUT_SECONDS
         )
@@ -410,7 +417,7 @@ class UnixSocketStreamTest(unittest.TestCase):
             while not self.stop_server:
                 try:
                     connection, client_address = self.server_socket.accept()
-                except socket.error:
+                except (OSError, socket.error):
                     # Probably no connection to accept yet
                     time.sleep(0.01)
                     continue

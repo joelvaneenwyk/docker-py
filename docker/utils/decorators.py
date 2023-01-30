@@ -43,5 +43,11 @@ def update_headers(f):
                 kwargs['headers'] = self._general_configs['HttpHeaders']
             else:
                 kwargs['headers'].update(self._general_configs['HttpHeaders'])
+
+            if 'X-Meta-Source-Client' in kwargs['headers']:
+                del kwargs['headers']['X-Meta-Source-Client']
+
+            if not kwargs.get('headers'):
+                del kwargs['headers']
         return f(self, *args, **kwargs)
     return inner

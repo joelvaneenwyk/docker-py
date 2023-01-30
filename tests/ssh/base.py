@@ -69,6 +69,8 @@ class BaseIntegrationTest(unittest.TestCase):
             client.close()
 
 
+@pytest.mark.skipif(not os.environ.get('DOCKER_HOST', '').startswith('ssh://'),
+                    reason='DOCKER_HOST is not an SSH target')
 class BaseAPIIntegrationTest(BaseIntegrationTest):
     """
     A test case for `APIClient` integration tests. It sets up an `APIClient`

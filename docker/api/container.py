@@ -220,7 +220,7 @@ class ContainerApiMixin(object):
                          mac_address=None, labels=None, stop_signal=None,
                          networking_config=None, healthcheck=None,
                          stop_timeout=None, runtime=None,
-                         use_config_proxy=True):
+                         use_config_proxy=True, platform=None):
         """
         Creates a container. Parameters are similar to those for the ``docker
         run`` command except it doesn't support the attach options (``-a``).
@@ -239,9 +239,9 @@ class ContainerApiMixin(object):
 
         .. code-block:: python
 
-            container_id = cli.create_container(
+            container_id = client.api.create_container(
                 'busybox', 'ls', ports=[1111, 2222],
-                host_config=cli.create_host_config(port_bindings={
+                host_config=client.api.create_host_config(port_bindings={
                     1111: 4567,
                     2222: None
                 })
@@ -253,22 +253,24 @@ class ContainerApiMixin(object):
 
         .. code-block:: python
 
-            cli.create_host_config(port_bindings={1111: ('127.0.0.1', 4567)})
+            client.api.create_host_config(
+                port_bindings={1111: ('127.0.0.1', 4567)}
+            )
 
         Or without host port assignment:
 
         .. code-block:: python
 
-            cli.create_host_config(port_bindings={1111: ('127.0.0.1',)})
+            client.api.create_host_config(port_bindings={1111: ('127.0.0.1',)})
 
         If you wish to use UDP instead of TCP (default), you need to declare
         ports as such in both the config and host config:
 
         .. code-block:: python
 
-            container_id = cli.create_container(
+            container_id = client.api.create_container(
                 'busybox', 'ls', ports=[(1111, 'udp'), 2222],
-                host_config=cli.create_host_config(port_bindings={
+                host_config=client.api.create_host_config(port_bindings={
                     '1111/udp': 4567, 2222: None
                 })
             )
@@ -278,7 +280,7 @@ class ContainerApiMixin(object):
 
         .. code-block:: python
 
-            cli.create_host_config(port_bindings={
+            client.api.create_host_config(port_bindings={
                 1111: [1234, 4567]
             })
 
@@ -286,7 +288,7 @@ class ContainerApiMixin(object):
 
         .. code-block:: python
 
-            cli.create_host_config(port_bindings={
+            client.api.create_host_config(port_bindings={
                 1111: [
                     ('192.168.0.100', 1234),
                     ('192.168.0.101', 1234)
@@ -302,9 +304,9 @@ class ContainerApiMixin(object):
 
         .. code-block:: python
 
-            container_id = cli.create_container(
+            container_id = client.api.create_container(
                 'busybox', 'ls', volumes=['/mnt/vol1', '/mnt/vol2'],
-                host_config=cli.create_host_config(binds={
+                host_config=client.api.create_host_config(binds={
                     '/home/user1/': {
                         'bind': '/mnt/vol2',
                         'mode': 'rw',
@@ -341,15 +343,15 @@ class ContainerApiMixin(object):
 
         .. code-block:: python
 
-            networking_config = docker_client.create_networking_config({
-                'network1': docker_client.create_endpoint_config(
+            networking_config = client.api.create_networking_config({
+                'network1': client.api.create_endpoint_config(
                     ipv4_address='172.28.0.124',
                     aliases=['foo', 'bar'],
                     links=['container2']
                 )
             })
 
-            ctnr = docker_client.create_container(
+            ctnr = client.api.create_container(
                 img, command, networking_config=networking_config
             )
 
@@ -393,6 +395,7 @@ class ContainerApiMixin(object):
                 configuration file (``~/.docker/config.json`` by default)
                 contains a proxy configuration, the corresponding environment
                 variables will be set in the container being created.
+            platform (str): Platform in the format ``os[/arch[/variant]]``.
 
         Returns:
             A dictionary with an image 'Id' key and a 'Warnings' key.
@@ -422,16 +425,22 @@ class ContainerApiMixin(object):
             stop_signal, networking_config, healthcheck,
             stop_timeout, runtime
         )
-        return self.create_container_from_config(config, name)
+        return self.create_container_from_config(config, name, platform)
 
     def create_container_config(self, *args, **kwargs):
         return ContainerConfig(self._version, *args, **kwargs)
 
-    def create_container_from_config(self, config, name=None):
+    def create_container_from_config(self, config, name=None, platform=None):
         u = self._url("/containers/create")
         params = {
             'name': name
         }
+        if platform:
+            if utils.version_lt(self._version, '1.41'):
+                raise errors.InvalidVersion(
+                    'platform is not supported for API version < 1.41'
+                )
+            params['platform'] = platform
         res = self._post_json(u, data=config, params=params)
         return self._result(res, True)
 
@@ -576,8 +585,11 @@ class ContainerApiMixin(object):
 
         Example:
 
-            >>> cli.create_host_config(privileged=True, cap_drop=['MKNOD'],
-                                       volumes_from=['nostalgic_newton'])
+            >>> client.api.create_host_config(
+            ...     privileged=True,
+            ...     cap_drop=['MKNOD'],
+            ...     volumes_from=['nostalgic_newton'],
+            ... )
             {'CapDrop': ['MKNOD'], 'LxcConf': None, 'Privileged': True,
              'VolumesFrom': ['nostalgic_newton'], 'PublishAllPorts': False}
 
@@ -607,11 +619,11 @@ class ContainerApiMixin(object):
 
         Example:
 
-            >>> docker_client.create_network('network1')
-            >>> networking_config = docker_client.create_networking_config({
-                'network1': docker_client.create_endpoint_config()
+            >>> client.api.create_network('network1')
+            >>> networking_config = client.api.create_networking_config({
+                'network1': client.api.create_endpoint_config()
             })
-            >>> container = docker_client.create_container(
+            >>> container = client.api.create_container(
                 img, command, networking_config=networking_config
             )
 
@@ -645,7 +657,7 @@ class ContainerApiMixin(object):
 
         Example:
 
-            >>> endpoint_config = client.create_endpoint_config(
+            >>> endpoint_config = client.api.create_endpoint_config(
                 aliases=['web', 'app'],
                 links={'app_db': 'db', 'another': None},
                 ipv4_address='132.65.0.123'
@@ -724,7 +736,7 @@ class ContainerApiMixin(object):
 
             >>> c = docker.APIClient()
             >>> f = open('./sh_bin.tar', 'wb')
-            >>> bits, stat = c.get_archive(container, '/bin/sh')
+            >>> bits, stat = c.api.get_archive(container, '/bin/sh')
             >>> print(stat)
             {'name': 'sh', 'size': 1075464, 'mode': 493,
              'mtime': '2018-10-01T15:37:48-07:00', 'linkTarget': ''}
@@ -811,11 +823,12 @@ class ContainerApiMixin(object):
             tail (str or int): Output specified number of lines at the end of
                 logs. Either an integer of number of lines or the string
                 ``all``. Default ``all``
-            since (datetime or int): Show logs since a given datetime or
-                integer epoch (in seconds)
+            since (datetime, int, or float): Show logs since a given datetime,
+                integer epoch (in seconds) or float (in fractional seconds)
             follow (bool): Follow log output. Default ``False``
-            until (datetime or int): Show logs that occurred before the given
-                datetime or integer epoch (in seconds)
+            until (datetime, int, or float): Show logs that occurred before
+                the given datetime, integer epoch (in seconds), or
+                float (in fractional seconds)
 
         Returns:
             (generator or str)
@@ -840,6 +853,8 @@ class ContainerApiMixin(object):
                 params['since'] = utils.datetime_to_timestamp(since)
             elif (isinstance(since, int) and since > 0):
                 params['since'] = since
+            elif (isinstance(since, float) and since > 0.0):
+                params['since'] = since
             else:
                 raise errors.InvalidArgument(
                     'since value should be datetime or positive int, '
@@ -854,6 +869,8 @@ class ContainerApiMixin(object):
             if isinstance(until, datetime):
                 params['until'] = utils.datetime_to_timestamp(until)
             elif (isinstance(until, int) and until > 0):
+                params['until'] = until
+            elif (isinstance(until, float) and until > 0.0):
                 params['until'] = until
             else:
                 raise errors.InvalidArgument(
@@ -911,7 +928,7 @@ class ContainerApiMixin(object):
 
             .. code-block:: python
 
-                >>> cli.port('7174d6347063', 80)
+                >>> client.api.port('7174d6347063', 80)
                 [{'HostIp': '0.0.0.0', 'HostPort': '80'}]
         """
         res = self._get(self._url("/containers/{0}/json", container))
@@ -1090,10 +1107,10 @@ class ContainerApiMixin(object):
 
         Example:
 
-            >>> container = cli.create_container(
+            >>> container = client.api.create_container(
             ...     image='busybox:latest',
             ...     command='/bin/sleep 30')
-            >>> cli.start(container=container.get('Id'))
+            >>> client.api.start(container=container.get('Id'))
         """
         if args or kwargs:
             raise errors.DeprecatedMethod(

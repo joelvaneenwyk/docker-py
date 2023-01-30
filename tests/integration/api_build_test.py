@@ -123,6 +123,9 @@ class BuildTest(BaseAPIIntegrationTest):
         with open(os.path.join(subdir, 'excepted-file'), 'w') as f:
             f.write("this file should not be ignored")
 
+        with open(os.path.join(subdir, 'excepted-with-spaces'), 'w') as f:
+            f.write("this file should not be ignored")
+
         tag = 'docker-py-test-build-with-dockerignore'
         stream = self.client.build(
             path=base_dir,
@@ -141,6 +144,7 @@ class BuildTest(BaseAPIIntegrationTest):
 
         assert sorted(list(filter(None, logs.split('\n')))) == sorted([
             '/test/#file.txt',
+            '/test/ignored/subdir/excepted-with-spaces',
             '/test/ignored/subdir/excepted-file',
             '/test/not-ignored'
         ])

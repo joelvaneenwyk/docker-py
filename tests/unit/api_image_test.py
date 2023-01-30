@@ -102,7 +102,7 @@ class ImageTest(BaseAPIClientTest):
                 'repo': None,
                 'comment': None,
                 'tag': None,
-                'container': '3cc2351ab11b',
+                'container': fake_api.FAKE_CONTAINER_ID,
                 'author': None,
                 'changes': None
             },
@@ -114,7 +114,7 @@ class ImageTest(BaseAPIClientTest):
 
         fake_request.assert_called_with(
             'DELETE',
-            url_prefix + 'images/e9aa60c60128',
+            url_prefix + 'images/' + fake_api.FAKE_IMAGE_ID,
             params={'force': False, 'noprune': False},
             timeout=DEFAULT_TIMEOUT_SECONDS
         )
@@ -289,7 +289,7 @@ class ImageTest(BaseAPIClientTest):
 
         fake_request.assert_called_with(
             'POST',
-            url_prefix + 'images/e9aa60c60128/tag',
+            url_prefix + 'images/' + fake_api.FAKE_IMAGE_ID + '/tag',
             params={
                 'tag': None,
                 'repo': 'repo',
@@ -307,7 +307,7 @@ class ImageTest(BaseAPIClientTest):
 
         fake_request.assert_called_with(
             'POST',
-            url_prefix + 'images/e9aa60c60128/tag',
+            url_prefix + 'images/' + fake_api.FAKE_IMAGE_ID + '/tag',
             params={
                 'tag': 'tag',
                 'repo': 'repo',
@@ -322,7 +322,7 @@ class ImageTest(BaseAPIClientTest):
 
         fake_request.assert_called_with(
             'POST',
-            url_prefix + 'images/e9aa60c60128/tag',
+            url_prefix + 'images/' + fake_api.FAKE_IMAGE_ID + '/tag',
             params={
                 'tag': None,
                 'repo': 'repo',
@@ -336,7 +336,7 @@ class ImageTest(BaseAPIClientTest):
 
         fake_request.assert_called_with(
             'GET',
-            url_prefix + 'images/e9aa60c60128/get',
+            url_prefix + 'images/' + fake_api.FAKE_IMAGE_ID + '/get',
             stream=True,
             timeout=DEFAULT_TIMEOUT_SECONDS
         )
