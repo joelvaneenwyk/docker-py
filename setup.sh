@@ -43,7 +43,7 @@ else
 fi
 
 if [ -x "$(command -v pyenv)" ]; then
-    versions=("3.10.9" "2.7.18" "3.9.16" "pypy3.9-7.3.11" "3.11.1" "3.8.16" "3.7.16")
+    versions=("3.10.9" "3.9.16" "3.11.1" "3.8.16" "3.7.16" "2.7.18" "pypy3.9-7.3.11")
     pyenv install --skip-existing "${versions[@]}"
     pyenv local "${versions[@]}"
     pyenv shell "${versions[@]}"
