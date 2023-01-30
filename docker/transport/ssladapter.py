@@ -1,33 +1,12 @@
-""" Resolves OpenSSL issues in some servers:
-      https://lukasa.co.uk/2013/01/Choosing_SSL_Version_In_Requests/
-      https://github.com/kennethreitz/requests/pull/799
 """
-import sys
+Resolves OpenSSL issues in some servers:
 
+    - https://lukasa.co.uk/2013/01/Choosing_SSL_Version_In_Requests/
+    - https://github.com/kennethreitz/requests/pull/799
+"""
+
+from docker.compat import HTTPAdapter, PoolManager, StrictVersion, urllib3
 from docker.transport.basehttpadapter import BaseHTTPAdapter
-
-from requests.adapters import HTTPAdapter
-
-try:
-    import requests.packages.urllib3 as urllib3  # type: ignore[import]
-except ImportError:
-    import urllib3  # type: ignore
-
-if sys.version_info[0] >= 3:
-    import warnings
-
-    warnings.filterwarnings("ignore", message="The distutils package is deprecated")
-    warnings.filterwarnings("ignore", message="distutils Version classes are deprecated")
-
-from distutils.version import StrictVersion
-
-PoolManager = urllib3.poolmanager.PoolManager
-
-# Monkey-patching match_hostname with a version that supports
-# IP-address checking. Not necessary for Python 3.5 and above
-if sys.version_info[:2] < (3, 5):
-    from backports.ssl_match_hostname import match_hostname
-    urllib3.connection.match_hostname = match_hostname
 
 
 class SSLHTTPAdapter(BaseHTTPAdapter):

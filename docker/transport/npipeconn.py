@@ -1,20 +1,8 @@
-import sys
-
 from .. import constants
+from ..compat import HTTPAdapter, httplib, urllib3
 from .basehttpadapter import BaseHTTPAdapter
 from .npipesocket import NpipeSocket
 
-if sys.version_info[0] >= 3:
-    import http.client as httplib
-else:
-    import httplib
-
-try:
-    import requests.packages.urllib3 as urllib3  # type: ignore[import]
-except ImportError:
-    import urllib3  # type: ignore
-
-import requests.adapters
 import six
 
 RecentlyUsedContainer = urllib3._collections.RecentlyUsedContainer
@@ -73,10 +61,11 @@ class NpipeHTTPConnectionPool(urllib3.connectionpool.HTTPConnectionPool):
 
 class NpipeHTTPAdapter(BaseHTTPAdapter):
 
-    __attrs__ = requests.adapters.HTTPAdapter.__attrs__ + ['npipe_path',
-                                                           'pools',
-                                                           'timeout',
-                                                           'max_pool_size']
+    __attrs__ = HTTPAdapter.__attrs__ + [
+        'npipe_path',
+        'pools',
+        'timeout',
+        'max_pool_size']
 
     def __init__(self, base_url, timeout=60,
                  pool_connections=constants.DEFAULT_NUM_POOLS,
