@@ -172,4 +172,5 @@ disable = [
     "use-symbolic-message-instead",
     "consider-using-f-string",
     "super-with-arguments",
+    "wrong-import-order",
 ]

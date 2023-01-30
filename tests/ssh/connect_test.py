@@ -2,9 +2,11 @@ import os
 import unittest
 
 import docker
+
+from .base import TEST_API_VERSION
+
 import paramiko.ssh_exception
 import pytest
-from .base import TEST_API_VERSION
 
 
 class SSHConnectionTest(unittest.TestCase):
