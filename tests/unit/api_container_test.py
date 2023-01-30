@@ -1267,7 +1267,7 @@ class ContainerTest(BaseAPIClientTest):
                         fake_inspect_container):
             with pytest.raises(docker.errors.InvalidArgument):
                 self.client.logs(fake_api.FAKE_CONTAINER_ID, stream=False,
-                                 follow=False, since=42.42)
+                                 follow=False, since="42.42")
 
     def test_log_tty(self):
         m = mock.Mock()

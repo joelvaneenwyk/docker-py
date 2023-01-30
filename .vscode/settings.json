@@ -154,8 +154,6 @@
         "info": "Warning"
     },
     "python.testing.pytestArgs": [
-        "-n",
-        "auto",
         "-c=${workspaceFolder}/tox.ini"
     ],
     "python.testing.pytestEnabled": true,

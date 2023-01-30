@@ -7,6 +7,8 @@ from docker.utils import kwargs_from_env
 
 from .. import helpers
 
+import pytest
+
 TEST_IMG = 'alpine:3.10'
 TEST_API_VERSION = os.environ.get('DOCKER_TEST_API_VERSION')
 
