@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
 _sudo() {
     if [ -x "$(command -v apt-get)" ]; then
         sudo "$@"
@@ -21,9 +23,9 @@ if [ -x "$(command -v pyenv)" ]; then
 else
     # curl https://pyenv.run | bash
     if [ ! -e "$HOME/.pyenv" ]; then
-        git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+        git clone https://github.com/pyenv/pyenv.git "$HOME/.pyenv"
         (
-            cd ~/.pyenv || true
+            cd "$HOME/.pyenv" || true
             src/configure
             make -C src
         )
@@ -34,7 +36,7 @@ else
         echo 'export PYENV_ROOT="$HOME/.pyenv"'
         echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"'
         echo 'eval "$(pyenv init -)"'
-    } >>~/.bashrc
+    } >>"$HOME/.bashrc"
 
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
@@ -45,8 +47,12 @@ fi
 if [ -x "$(command -v pyenv)" ]; then
     versions=("3.10.9" "3.9.16" "3.11.1" "3.8.16" "3.7.16" "2.7.18" "pypy3.9-7.3.11")
     pyenv install --skip-existing "${versions[@]}"
-    pyenv local "${versions[@]}"
-    pyenv shell "${versions[@]}"
+
+    if [ ! -e "$SCRIPT_DIR/.python-version" ]; then
+        pyenv global "${versions[@]}"
+        pyenv local "${versions[@]}"
+        pyenv shell "${versions[@]}"
+    fi
 fi
 
 if [ ! -x "$(command -v poetry)" ]; then
@@ -57,10 +63,11 @@ if [ -x "$(command -v poetry)" ]; then
     poetry install --only main
 fi
 
-if [ -x "$(command -v python3)" ]; then
-    python3 -m pip install \
+if [ -x "$(command -v python)" ]; then
+    python -m pip install -U wheel pip setuptools
+    python -m pip install \
         --user --no-warn-script-location \
-        tox wheel setuptools twine poetry \
+        tox wheel setuptools twine poetry coverage \
         flake8 pytest pytest-timeout pytest-xdist mypy isort pylint \
         six requests websocket \
         paramiko \
