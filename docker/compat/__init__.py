@@ -33,7 +33,29 @@ if sys.version_info[:2] < (3, 5):
 RecentlyUsedContainer = urllib3._collections.RecentlyUsedContainer  # type: ignore
 PoolManager = urllib3.poolmanager.PoolManager
 
+import six  # noqa
+from six import (  # noqa
+    binary_type, ensure_binary, integer_types, iteritems, moves,
+    PY2, PY3, string_types, text_type, u)
+
+# six\.([a-zA-Z._\d]+)
+# binary_type
+# ensure_binary
+# integer_types
+# iteritems
+# moves
+# moves.BaseHTTPServer.BaseHTTPRequestHandler
+# moves.queue.Empty
+# moves.socketserver.ThreadingTCPServer
+# moves.urllib_parse.urlparse
+# moves.urllib.parse.quote
+# PY2
+# PY3
+# string_types
+# text_type
+# u
+
 __all__ = [
     'RecentlyUsedContainer', 'match_hostname', 'httplib', 'CertificateError',
-    'HTTPAdapter', 'StrictVersion', 'PoolManager'
+    'HTTPAdapter', 'StrictVersion', 'PoolManager', 'six'
 ]

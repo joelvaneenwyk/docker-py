@@ -5,7 +5,8 @@ import logging
 from . import credentials, errors
 from .utils import config
 
-import six
+from docker.compat import six
+
 
 INDEX_NAME = 'docker.io'
 INDEX_URL = 'https://index.{0}/v1/'.format(INDEX_NAME)
