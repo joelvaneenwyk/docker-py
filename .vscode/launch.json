@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "justMyCode": true
+        },
+        {
+            "name": "pytest",
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "stopOnEntry": true,
+            "module": "pytest",
+            "args": [
+                "-rfEx",
+                "--showlocals",
+                "--color=yes",
+                "tests/unit/api_test.py"
+            ],
+            "cwd": "${workspaceFolder}",
+            "presentation": {
+                "hidden": false,
+                "group": "0. Default",
+                "order": 2
+            }
+        },
+    ]
+}
