@@ -119,7 +119,9 @@ except AttributeError:
 
 def _CloseHandle(handle):
     # type: (Handle) -> None
-    return CloseHandle(handle)
+    if CloseHandle is not None:
+        return CloseHandle(handle)
+    return None
 
 
 def _ReadFile(
@@ -145,13 +147,15 @@ def _WriteFile(
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
     """
     number_of_bytes_written = DWORD(0)
-    result = BOOL(WriteFile(
-        handle,
-        buffer, len(buffer),
-        ctypes.byref(number_of_bytes_written), None))
-    if result.value == 0:
-        raise WinError(result.value, "WriteFile", "Failed to write file.")
-    return result.value, number_of_bytes_written.value
+    if WriteFile is not None:
+        result = BOOL(WriteFile(
+            handle,
+            buffer, len(buffer),
+            ctypes.byref(number_of_bytes_written), None))
+        if result.value == 0:
+            raise WinError(result.value, "WriteFile", "Failed to write file.")
+        return result.value, number_of_bytes_written.value
+    return 0, 0
 
 
 def _CreateFile(
@@ -164,7 +168,9 @@ def _CreateFile(
     """See: CreateFile function
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
     """
-    return HANDLE(CreateFileW(filename, access, mode, None, creation, flags, None))
+    if CreateFileW is not None:
+        return HANDLE(CreateFileW(filename, access, mode, None, creation, flags, None))
+    return HANDLE(0)
 
 
 def _GetNamedPipeInfo(handle):
@@ -196,7 +202,7 @@ def _GetNamedPipeInfo(handle):
 
 class Win32(object):
     """
-    Wrapper around win32file and win32pipe in case 'pywin32' is not installed.
+    Wrapper around `win32file` and `win32pipe` in case 'pywin32' is not installed.
     """
 
     GENERIC_READ = 0x80000000

@@ -3,10 +3,8 @@ import json
 import logging
 
 from . import credentials, errors
+from .compat import six
 from .utils import config
-
-from docker.compat import six
-
 
 INDEX_NAME = 'docker.io'
 INDEX_URL = 'https://index.{0}/v1/'.format(INDEX_NAME)

@@ -10,9 +10,9 @@ except ImportError:
 from requests.adapters import HTTPAdapter  # type: ignore[import]  # noqa
 
 try:
-    from backports.ssl_match_hostname import CertificateError, match_hostname
+    from ssl import CertificateError, match_hostname
 except ImportError:
-    from ssl import CertificateError, match_hostname  # noqa
+    from backports.ssl_match_hostname import CertificateError, match_hostname  # noqa
 
 if sys.version_info[0] >= 3:
     import http.client as httplib  # noqa
@@ -34,9 +34,7 @@ RecentlyUsedContainer = urllib3._collections.RecentlyUsedContainer  # type: igno
 PoolManager = urllib3.poolmanager.PoolManager
 
 import six  # noqa
-from six import (  # noqa
-    binary_type, ensure_binary, integer_types, iteritems, moves,
-    PY2, PY3, string_types, text_type, u)
+from six import binary_type, ensure_binary, integer_types, iteritems, moves, PY2, PY3, string_types, text_type, u  # noqa
 
 # six\.([a-zA-Z._\d]+)
 # binary_type
