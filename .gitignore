@@ -21,6 +21,7 @@ html/*
 _build/
 README.rst
 
+*.pyc.*
 env/
 venv/
 .idea/
