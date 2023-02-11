@@ -67,11 +67,7 @@ if [ -x "$(command -v python)" ]; then
     python -m pip install -U wheel pip setuptools
     python -m pip install \
         --user --no-warn-script-location \
-        tox wheel setuptools twine poetry coverage \
-        flake8 pytest pytest-timeout pytest-xdist mypy isort pylint \
-        six requests websocket \
-        paramiko \
-        types-six types-urllib3 types-requests types-paramiko
+        -r "$SCRIPT_DIR/requirements-dev.txt"
 fi
 
 if [ -e "/local" ]; then
