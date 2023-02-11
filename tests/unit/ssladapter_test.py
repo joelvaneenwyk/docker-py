@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from docker.compat import CertificateError, match_hostname
@@ -55,7 +56,7 @@ class MatchHostnameTest(unittest.TestCase):
     }
 
     def test_match_ip_address_success(self):
-        assert match_hostname(self.cert, '127.0.0.1') is None
+        assert match_hostname(self.cert, '127.0.0.1' if sys.version_info[0] >= 3 else 'localhost') is None
 
     def test_match_localhost_success(self):
         assert match_hostname(self.cert, 'localhost') is None
