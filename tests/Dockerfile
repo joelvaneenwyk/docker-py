@@ -27,11 +27,14 @@ RUN curl -sSL -o /opt/docker-credential-pass.tar.gz \
     chmod +x /usr/local/bin/docker-credential-pass
 
 WORKDIR /src
-COPY requirements.txt /src/requirements.txt
+
+RUN python -m pip install -U pip
+
+COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-COPY requirements-test.txt /src/requirements-test.txt
+COPY requirements-test.txt ./requirements-test.txt
 RUN pip install -r requirements-test.txt
 
-COPY . /src
+COPY . ./
 RUN pip install .

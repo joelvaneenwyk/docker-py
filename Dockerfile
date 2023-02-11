@@ -8,15 +8,16 @@ FROM python:${PYTHON_VERSION}
 COPY tests/ssh-keys /root/.ssh
 RUN chmod -R 600 /root/.ssh
 
-RUN mkdir /src
 WORKDIR /src
 
-COPY requirements.txt /src/requirements.txt
+RUN python -m pip install -U pip
+
+COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY requirements-test.txt /src/requirements-test.txt
+COPY requirements-test.txt ./requirements-test.txt
 RUN pip install --no-cache-dir -r requirements-test.txt
 
-COPY . /src
+COPY . ./
 ARG SETUPTOOLS_SCM_PRETEND_VERSION_DOCKER
 RUN pip install --no-cache-dir .
