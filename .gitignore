@@ -9,6 +9,8 @@ dist
 # pyenv
 .python-version
 
+.pyre/
+
 sh_bin.tar
 
 .tox
