@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import unittest
 
 from docker.constants import DEFAULT_DOCKER_API_VERSION
@@ -390,13 +391,13 @@ class MountTest(unittest.TestCase):
         assert mount['Target'] == "/baz"
         assert mount['Type'] == 'bind'
 
-    @pytest.mark.xfail
     def test_parse_mount_bind_windows(self):
-        with mock.patch('docker.types.services.IS_WINDOWS_PLATFORM', True):
-            mount = Mount.parse_mount_string('C:/foo/bar:/baz')
-        assert mount['Source'] == "C:/foo/bar"
-        assert mount['Target'] == "/baz"
-        assert mount['Type'] == 'bind'
+        if os.name == 'nt':
+            with mock.patch('docker.types.services.IS_WINDOWS_PLATFORM', True):
+                mount = Mount.parse_mount_string('C:/foo/bar:/baz')
+            assert mount['Source'] == "C:/foo/bar"
+            assert mount['Target'] == "/baz"
+            assert mount['Type'] == 'bind'
 
 
 class ServicePortsTest(unittest.TestCase):
