@@ -1,0 +1,30 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="docker - dev" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+    <deployment type="dockerfile">
+      <settings>
+        <option name="imageTag" value="pydocker:dev" />
+        <option name="buildArgs">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="DEV_MODE" />
+              <option name="value" value="1" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
+        <option name="containerName" value="pydocker_dev" />
+        <option name="commandLineOptions" value="-it" />
+        <option name="sourceFilePath" value="Dockerfile" />
+        <option name="volumeBindings">
+          <list>
+            <DockerVolumeBindingImpl>
+              <option name="containerPath" value="/workspace" />
+              <option name="hostPath" value="C:\Users\jovaneen.NORTHAMERICA\Projects\docker-py" />
+              <option name="readOnly" value="true" />
+            </DockerVolumeBindingImpl>
+          </list>
+        </option>
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

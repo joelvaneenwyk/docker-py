@@ -10,19 +10,26 @@ RUN apt-get update && apt-get install -y bash
 COPY ./tests/ssh-keys /root/.ssh
 RUN chmod -R 600 /root/.ssh
 
+ARG username=sphinx
+ARG uid=1000
+ARG gid=1000
+RUN addgroup --gid $gid ${username} \
+    && useradd --uid $uid --gid $gid -M ${username}
+
+USER ${username}
+
 ENV HOME="/root"
 ENV PATH="${PATH}:$HOME/.local/bin"
 
 WORKDIR /src
 
-RUN python -m pip install -U pip
+RUN python -m pip install --no-cache-dir --upgrade pip
 
-COPY requirements.txt ./requirements.txt
+COPY requirements*.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
-COPY requirements-test.txt ./requirements-test.txt
-RUN pip install --no-cache-dir -r requirements-test.txt
-
+ARG SETUPTOOLS_SCM_PRETEND_VERSION_DOCKER
 ARG DEV_MODE=0
 ENV PYENV_ROOT="$HOME/.pyenv"
 ENV PATH="${PATH}:$PYENV_ROOT/bin"
@@ -44,12 +51,6 @@ RUN if [ ! $DEV_MODE = 0 ]; then \
     fi
 
 COPY . ./
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_DOCKER
-# RUN pip install --no-cache-dir .
-RUN pip install tox
-
-RUN mkdir /workspace
-WORKDIR /workspace
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["bash"]

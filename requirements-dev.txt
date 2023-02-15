@@ -22,6 +22,9 @@ websocket
 
 paramiko
 
+recommonmark>=0.4.0
+Sphinx>=1.4.6
+
 mypy; python_version >= '3.0'
 types-six; python_version >= '3.0'
 types-urllib3; python_version >= '3.0'
