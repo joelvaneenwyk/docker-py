@@ -15,8 +15,8 @@ setlocal EnableDelayedExpansion
     set "PATH=%PATH%;C:\ProgramData\chocolatey\bin"
 
     :RunPython
-    call "%~dp0py.bat" -m pip install --upgrade pip
-    call "%~dp0py.bat" -m pip install --user --no-warn-script-location ^
+    python -m pip install --upgrade pip
+    python -m pip install --no-warn-script-location ^
         -r "%~dp0requirements-dev.txt"
 endlocal & (
     set "PATH=%PATH%"

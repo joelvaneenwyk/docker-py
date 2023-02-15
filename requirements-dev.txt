@@ -7,6 +7,7 @@ mock>=1.0.1
 mypy; python_version >= '3.0'
 
 paramiko
+pipx
 poetry; python_version >= '3.0'
 
 pre-commit
@@ -20,7 +21,8 @@ pytest-xdist
 recommonmark>=0.4.0
 requests
 
-setuptools>=44.0.0  # last version with python 2.7 support
+setuptools==44.0.0; python_version < '3.0'   # last version with Python 2.7 support
+setuptools>=66.0.0; python_version >= '3.0'
 
 six
 Sphinx>=1.4.6
