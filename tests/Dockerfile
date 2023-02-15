@@ -30,11 +30,9 @@ WORKDIR /src
 
 RUN python -m pip install -U pip
 
-COPY requirements.txt ./requirements.txt
+COPY requirements*.txt ./
 RUN pip install -r requirements.txt
-
-COPY requirements-test.txt ./requirements-test.txt
-RUN pip install -r requirements-test.txt
+RUN pip install -r requirements-dev.txt
 
 COPY . ./
 RUN pip install .
