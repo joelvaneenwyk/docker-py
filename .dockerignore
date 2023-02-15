@@ -7,9 +7,12 @@ dist
 *.pyc
 *.swp
 
-.tox
+.tox/
+.pytest_cache/
+.run/
 .coverage
 html/*
+venv/
 __pycache__
 
 # Compiled Documentation
