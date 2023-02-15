@@ -13,20 +13,20 @@ First create a container that runs in the background:
 ...     'bfirsh/reticulate-splines', detach=True)
 
 Prepare the command we are going to use. It prints "hello stdout"
-in `stdout`, followed by "hello stderr" in `stderr`:
+in ``stdout``, followed by "hello stderr" in ``stderr``:
 
 >>> cmd = '/bin/sh -c "echo hello stdout ; echo hello stderr >&2"'
 We'll run this command with all four the combinations of ``stream``
 and ``demux``.
 With ``stream=False`` and ``demux=False``, the output is a string
-that contains both the `stdout` and the `stderr` output:
+that contains both the ``stdout`` and the ``stderr`` output:
 >>> res = container.exec_run(cmd, stream=False, demux=False)
 >>> res.output
 b'hello stderr\nhello stdout\n'
 
 With ``stream=True``, and ``demux=False``, the output is a
 generator that yields strings containing the output of both
-`stdout` and `stderr`:
+``stdout`` and ``stderr``:
 
 >>> res = container.exec_run(cmd, stream=True, demux=False)
 >>> next(res.output)

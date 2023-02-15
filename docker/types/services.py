@@ -443,7 +443,7 @@ class UpdateConfig(dict):
 
 class RollbackConfig(UpdateConfig):
     """
-    Used to specify the way containe rollbacks should be performed by a service
+    Used to specify the way contain rollbacks should be performed by a service
 
     Args:
         parallelism (int): Maximum number of tasks to be rolled back in one

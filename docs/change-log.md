@@ -38,7 +38,7 @@ Change log
 [List of PRs / issues for this release](https://github.com/docker/docker-py/milestone/69?closed=1)
 
 ### Bugfixes
-- Avoid setting unsuported parameter for subprocess.Popen on Windows
+- Avoid setting unsupported parameter for subprocess.Popen on Windows
 - Replace use of deprecated "filter" argument on ""docker/api/image"
 
 4.4.0
@@ -1688,7 +1688,7 @@ like the others
 
 * Added the `execute` command.
 * Added `pause` and `unpause` commands.
-* Added support fo the `cpuset` param in `create_container`
+* Added support for the `cpuset` param in `create_container`
 * Added support for host devices (`devices` param in `start`)
 * Added support for the `tail` param in `logs`.
 * Added support for the `filters` param in `images` and `containers`
