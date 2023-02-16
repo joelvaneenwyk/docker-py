@@ -1,56 +1,116 @@
-# syntax=docker/dockerfile:2
+# syntax=docker/dockerfile:1.4
+
+ARG USERNAME=sphinx
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+ARG WORKSPACE_DIR="/src"
+
+ARG PYTHON_VERSIONS="3.10.9 3.9.16 3.11.1 3.8.16 3.7.16 2.7.18 pypy3.9-7.3.11"
 
 ARG PYTHON_VERSION=3.10
-FROM python:${PYTHON_VERSION}
+FROM python:${PYTHON_VERSION} AS python_base
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y bash
+ARG USERNAME
+ARG USER_ID
+ARG GROUP_ID
+ARG WORKSPACE_DIR
+ARG PYTHON_VERSIONS
 
-# Add SSH keys and set permissions
-COPY ./tests/ssh-keys /root/.ssh
-RUN chmod -R 600 /root/.ssh
+ENV DEBIAN_FRONTEND=noninteractive
+ENV USERNAME=$USERNAME
+ENV USER_ID=$USER_ID
+ENV GROUP_ID=$GROUP_ID
 
-ARG username=sphinx
-ARG uid=1000
-ARG gid=1000
-RUN addgroup --gid $gid ${username} \
-    && useradd --uid $uid --gid $gid -M ${username}
+RUN apt-get update \
+    && apt-get install -y \
+    bash sudo curl wget git
 
-USER ${username}
+RUN addgroup --gid $GROUP_ID ${USERNAME} \
+    && useradd --uid $USER_ID --gid $GROUP_ID -M ${USERNAME} \
+    && usermod -aG sudo ${USERNAME}
+RUN mkdir -p "/home/${USERNAME}" \
+    && sudo chown -R ${USERNAME}:${USERNAME} "/home/${USERNAME}" \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-ENV HOME="/root"
-ENV PATH="${PATH}:$HOME/.local/bin"
+ENV WORKSPACE_DIR="${WORKSPACE_DIR}"
+RUN mkdir -p ${WORKSPACE_DIR} \
+    && chown -R ${USERNAME}:${USERNAME} ${WORKSPACE_DIR}
 
-WORKDIR /src
+USER ${USERNAME}
 
-RUN python -m pip install --no-cache-dir --upgrade pip
+ENV HOME="/home/${USERNAME}"
+ENV PYTHON_VERSIONS="${PYTHON_VERSIONS}"
+
+WORKDIR ${WORKSPACE_DIR}
+SHELL ["/bin/bash", "--login", "-c"]
+
+RUN curl https://pyenv.run | bash \
+    && echo 'export HOME="/home/${USERNAME}"' >>~/.bashrc \
+    && echo 'export PYENV_ROOT="$HOME/.pyenv"' >>~/.bashrc \
+    && echo 'export PATH="$HOME/.local/bin:$PYENV_ROOT/bin:$PATH"' >>~/.bashrc \
+    && echo 'eval "$(pyenv init -)"' >>~/.bashrc
+
+RUN source ~/.bashrc \
+    && versions=($(echo "$PYTHON_VERSIONS" | tr ' ' '\n')) \
+    && if [ ! ${#versions[@]} -eq 0 ]; then pyenv install "${versions[@]}"; fi
+
+FROM python_base AS python_shell
+
+ARG USERNAME
+
+RUN source ~/.bashrc \
+    && sudo apt-get update \
+    && sudo apt-get install -y --no-install-recommends \
+    build-essential procps curl file git \
+    && bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+    && echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' >>~/.bashrc
+
+RUN source ~/.bashrc \
+    && brew update \
+    && brew install jandedobbeleer/oh-my-posh/oh-my-posh \
+    && echo 'eval "$(oh-my-posh init bash)"'>>~/.bashrc
+
+RUN source ~/.bashrc \
+    && oh-my-posh font install
+
+FROM python_shell AS python_docker
+
+ARG USERNAME
+ARG SETUPTOOLS_SCM_PRETEND_VERSION_DOCKER
+
+RUN sudo apt-get update \
+    && sudo apt-get install -y --no-install-recommends \
+    ca-certificates curl gnupg lsb-release apt-transport-https \
+    && sudo mkdir -m 0755 -p /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    && sudo chmod a+r /etc/apt/keyrings/docker.gpg \
+    && echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && sudo apt-get update \
+    && sudo apt-get install -y --no-install-recommends \
+    docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+FROM python_docker AS python_docker_sdk
+ARG USERNAME
 
 COPY requirements*.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r requirements-dev.txt
 
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_DOCKER
-ARG DEV_MODE=0
-ENV PYENV_ROOT="$HOME/.pyenv"
-ENV PATH="${PATH}:$PYENV_ROOT/bin"
-ENV PY_VERSIONS="3.10.9 3.9.16 3.11.1 3.8.16 3.7.16 2.7.18 pypy3.9-7.3.11"
+RUN for python_version in $(pyenv versions --bare); do \
+    eval "$(pyenv init -)" \
+    && pyenv shell $python_version \
+    && python -m pip install --upgrade pip virtualenv wheel tox pre-commit pipx; \
+    done
 
-RUN curl https://pyenv.run | bash \
-    && echo 'export PYENV_ROOT="$HOME/.pyenv"' >>"$HOME/.bashrc" \
-    && echo 'export PATH="$PYENV_ROOT/bin:$PATH"'>>"$HOME/.bashrc" \
-    && echo 'eval "$(pyenv init -)"'>>"$HOME/.bashrc" \
-    && eval "$(pyenv init -)"
+# Add SSH keys and set permissions
+ENV HOME="/home/${USERNAME}"
+COPY ./tests/ssh-keys ${HOME}/.ssh
+RUN sudo chmod -R 600 ${HOME}/.ssh
 
-SHELL ["/bin/bash", "-c"]
-RUN if [ ! $DEV_MODE = 0 ]; then \
-      versions=($(echo "$PY_VERSIONS" | tr ' ' '\n')); \
-      pyenv install "${versions[@]}"; \
-      pyenv global "${versions[@]}"; \
-      pyenv local "${versions[@]}"; \
-      pyenv shell "${versions[@]}"; \
-    fi
-
-COPY . ./
+COPY --chown=${USER} . ./
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["bash"]
