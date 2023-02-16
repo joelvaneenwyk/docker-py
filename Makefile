@@ -1,6 +1,8 @@
 TEST_API_VERSION ?= 1.41
 TEST_ENGINE_VERSION ?= 20.10
 
+makeFileDir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 ifeq ($(OS),Windows_NT)
     PLATFORM := Windows
 else
@@ -149,3 +151,25 @@ docs: build-docs
 .PHONY: shell
 shell: build
 	docker run -it -v /var/run/docker.sock:/var/run/docker.sock docker-sdk-python python
+
+.PHONY: upgrade
+upgrade:
+	pre-commit autoupdate
+	python -m pip install --upgrade pip-tools pip wheel
+	python -m piptools compile --upgrade --resolver backtracking -o requirements.txt pyproject.toml
+	python -m piptools compile --extra dev --upgrade --resolver backtracking -o requirements-dev.txt pyproject.toml
+
+.PHONY: docker-build
+docker-build:
+	docker build \
+		-t "docker-py" \
+		--build-arg PYTHON_VERSIONS="" \
+		-f "$(makeFileDir)/Dockerfile" \
+		"$(makeFileDir)"
+
+.PHONY: bash
+run: docker-build
+	docker run -it \
+		-v "//var/run/docker.sock:/var/run/docker.sock" \
+		-v "$(makeFileDir):/src" \
+		docker-py bash
