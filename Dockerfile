@@ -72,7 +72,12 @@ RUN source ~/.bashrc \
     && echo 'eval "$(oh-my-posh init bash)"'>>~/.bashrc
 
 RUN source ~/.bashrc \
-    && oh-my-posh font install
+    && sudo apt-get update \
+    && sudo apt-get install -y --no-install-recommends \
+    curl \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN cargo install lsd
+RUN echo 'alias ll="lsd -al"' >> ~/.bashrc
 
 FROM python_shell AS python_docker
 
