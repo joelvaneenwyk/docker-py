@@ -131,8 +131,8 @@
     "python.linting.pycodestyleArgs": [
         "--config=${workspaceFolder}/tox.ini"
     ],
-    "python.linting.pycodestyleEnabled": false,
-    "python.linting.pydocstyleEnabled": false,
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pydocstyleEnabled": true,
     "python.linting.pylintEnabled": true,
     "pylint.importStrategy": "fromEnvironment",
     "pylint.path": [
@@ -177,5 +177,16 @@
         "shellcheck",
         "stuartleeks",
         "withfig"
-    ]
+    ],
+    "sarif-viewer.connectToGithubCodeScanning": "off",
+    "vsintellicode.features.python.deepLearning": "enabled",
+    "python.linting.mypyCategorySeverity.note": "Warning",
+    "python.linting.pylintCategorySeverity.convention": "Error",
+    "python.linting.pylintCategorySeverity.refactor": "Warning",
+    "python.terminal.focusAfterLaunch": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.ignore": [
+        "venv"
+    ],
+    "python.analysis.inlayHints.pytestParameters": true
 }

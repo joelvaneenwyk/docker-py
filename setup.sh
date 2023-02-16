@@ -15,13 +15,13 @@ main() {
 
     _sudo chown vscode .tox || true
 
-    if [ -x "$(command -v apt-get)" ]; then
+    if [ -n "$(command -v apt-get)" ]; then
         if _sudo apt-get update; then
             _sudo apt-get install -y --no-install-recommends rsync
         fi
     fi
 
-    if [ -x "$(command -v pyenv)" ]; then
+    if [ -n "$(command -v pyenv)" ]; then
         echo "Found 'pyenv' installation: $(command -v pyenv)"
     else
         # curl https://pyenv.run | bash
@@ -47,7 +47,7 @@ main() {
         echo "Initialized 'pyenv' environment: '${PYENV_ROOT}'"
     fi
 
-    if [ -x "$(command -v pyenv)" ]; then
+    if [ -n "$(command -v pyenv)" ]; then
         versions=("3.10.9" "3.9.16" "3.11.1" "3.8.16" "3.7.16" "2.7.18" "pypy3.9-7.3.11")
         pyenv install --skip-existing "${versions[@]}"
 
@@ -58,27 +58,27 @@ main() {
         fi
     fi
 
-    if [ ! -x "$(command -v poetry)" ]; then
+    if [ -z "$(command -v poetry)" ]; then
         curl -sSL https://install.python-poetry.org | python3 -
     fi
 
-    if [ -x "$(command -v poetry)" ]; then
+    if [ -n "$(command -v poetry)" ]; then
         poetry install --only main
     fi
 
-    if [ -x "$(command -v python)" ]; then
+    if [ -n "$(command -v python)" ]; then
         python -m pip install -U wheel pip setuptools tox
         python -m pip install \
             --user \
             -r "$SCRIPT_DIR/requirements-dev.txt"
     fi
 
-    if [ -e "/local" ]; then
+    if [ -e "/workspace" ] && [ -e "/local" ]; then
         rsync \
             --exclude '.tox' --exclude '__pycache__' --exclude '.mypy_cache' --exclude '.pytest_cache' --exclude '*.pyc' \
             --exclude 'docker.egg-info' --exclude '.coverage.*' \
             -v -a \
-            /workspace/ /local/
+            /src/ /local/
     fi
 }
 
