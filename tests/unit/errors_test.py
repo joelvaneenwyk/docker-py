@@ -108,7 +108,7 @@ class APIErrorTest(unittest.TestCase):
             resp.raise_for_status()
         except requests.exceptions.HTTPError as e:
             try:
-                create_api_error_from_http_exception(e)
+                raise create_api_error_from_http_exception(e)
             except APIError as e:
                 err = e
         assert err.is_server_error() is True
