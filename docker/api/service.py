@@ -7,9 +7,7 @@ def _check_api_features(version, task_template, update_config, endpoint_spec,
 
     def raise_version_error(param, min_version):
         raise errors.InvalidVersion(
-            '{} is not supported in API version < {}'.format(
-                param, min_version
-            )
+            f'{param} is not supported in API version < {min_version}'
         )
 
     if update_config is not None:
@@ -262,7 +260,7 @@ class ServiceApiMixin:
         return True
 
     @utils.minimum_version('1.24')
-    def services(self, filters=None):
+    def services(self, filters=None, status=None):
         """
         List services.
 
@@ -270,6 +268,8 @@ class ServiceApiMixin:
             filters (dict): Filters to process on the nodes list. Valid
                 filters: ``id``, ``name`` , ``label`` and ``mode``.
                 Default: ``None``.
+            status (bool): Include the service task count of running and
+                desired tasks. Default: ``None``.
 
         Returns:
             A list of dictionaries containing data about each service.
@@ -281,6 +281,12 @@ class ServiceApiMixin:
         params = {
             'filters': utils.convert_filters(filters) if filters else None
         }
+        if status is not None:
+            if utils.version_lt(self._version, '1.41'):
+                raise errors.InvalidVersion(
+                    'status is not supported in API version < 1.41'
+                )
+            params['status'] = status
         url = self._url('/services')
         return self._result(self._get(url, params=params), True)
 

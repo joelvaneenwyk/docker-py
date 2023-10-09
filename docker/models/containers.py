@@ -47,11 +47,11 @@ class Container(Model):
         try:
             result = self.attrs['Config'].get('Labels')
             return result or {}
-        except KeyError:
+        except KeyError as ke:
             raise DockerException(
                 'Label data is not available for sparse objects. Call reload()'
                 ' to retrieve all information'
-            )
+            ) from ke
 
     @property
     def status(self):
@@ -121,6 +121,7 @@ class Container(Model):
             tag (str): The tag to push
             message (str): A commit message
             author (str): The name of the author
+            pause (bool): Whether to pause the container before committing
             changes (str): Dockerfile instructions to apply while committing
             conf (dict): The configuration for the container. See the
                 `Engine API documentation
@@ -141,7 +142,8 @@ class Container(Model):
         Inspect changes on a container's filesystem.
 
         Returns:
-            (str)
+            (list) A list of dictionaries containing the attributes `Path`
+                and `Kind`.
 
         Raises:
             :py:class:`docker.errors.APIError`
@@ -324,7 +326,7 @@ class Container(Model):
         Args:
             path (str): Path inside the container where the file(s) will be
                 extracted. Must exist.
-            data (bytes): tar data to be extracted
+            data (bytes or stream): tar data to be extracted
 
         Returns:
             (bool): True if the call succeeds.

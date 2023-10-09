@@ -11,12 +11,8 @@ import subprocess
 from docker.transport.basehttpadapter import BaseHTTPAdapter
 from .. import constants
 
-import http.client as httplib
-
-try:
-    import requests.packages.urllib3 as urllib3
-except ImportError:
-    import urllib3
+import urllib3
+import urllib3.connection
 
 RecentlyUsedContainer = urllib3._collections.RecentlyUsedContainer
 
@@ -99,7 +95,7 @@ class SSHSocket(socket.socket):
         self.proc.terminate()
 
 
-class SSHConnection(httplib.HTTPConnection):
+class SSHConnection(urllib3.connection.HTTPConnection):
     def __init__(self, ssh_transport=None, timeout=60, host=None):
         super().__init__(
             'localhost', timeout=timeout
@@ -145,8 +141,8 @@ class SSHConnectionPool(urllib3.connectionpool.HTTPConnectionPool):
         try:
             conn = self.pool.get(block=self.block, timeout=timeout)
 
-        except AttributeError:  # self.pool is None
-            raise urllib3.exceptions.ClosedPoolError(self, "Pool is closed.")
+        except AttributeError as ae:  # self.pool is None
+            raise urllib3.exceptions.ClosedPoolError(self, "Pool is closed.") from ae
 
         except queue.Empty:
             if self.block:
@@ -154,7 +150,7 @@ class SSHConnectionPool(urllib3.connectionpool.HTTPConnectionPool):
                     self,
                     "Pool reached maximum size and no more "
                     "connections are allowed."
-                )
+                ) from None
             # Oh well, we'll create a new connection then
 
         return conn or self._new_conn()

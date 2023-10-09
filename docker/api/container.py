@@ -112,7 +112,7 @@ class ContainerApiMixin:
 
     @utils.check_resource('container')
     def commit(self, container, repository=None, tag=None, message=None,
-               author=None, changes=None, conf=None):
+               author=None, pause=True, changes=None, conf=None):
         """
         Commit a container to an image. Similar to the ``docker commit``
         command.
@@ -123,6 +123,7 @@ class ContainerApiMixin:
             tag (str): The tag to push
             message (str): A commit message
             author (str): The name of the author
+            pause (bool): Whether to pause the container before committing
             changes (str): Dockerfile instructions to apply while committing
             conf (dict): The configuration for the container. See the
                 `Engine API documentation
@@ -139,6 +140,7 @@ class ContainerApiMixin:
             'tag': tag,
             'comment': message,
             'author': author,
+            'pause': pause,
             'changes': changes
         }
         u = self._url("/commit")
@@ -317,6 +319,11 @@ class ContainerApiMixin:
                     '/var/www': {
                         'bind': '/mnt/vol1',
                         'mode': 'ro',
+                    },
+                    '/autofs/user1': {
+                        'bind': '/mnt/vol3',
+                        'mode': 'rw',
+                        'propagation': 'shared'
                     }
                 })
             )
@@ -327,10 +334,11 @@ class ContainerApiMixin:
         .. code-block:: python
 
             container_id = client.api.create_container(
-                'busybox', 'ls', volumes=['/mnt/vol1', '/mnt/vol2'],
+                'busybox', 'ls', volumes=['/mnt/vol1', '/mnt/vol2', '/mnt/vol3'],
                 host_config=client.api.create_host_config(binds=[
                     '/home/user1/:/mnt/vol2',
                     '/var/www:/mnt/vol1:ro',
+                    '/autofs/user1:/mnt/vol3:rw,shared',
                 ])
             )
 
@@ -678,7 +686,8 @@ class ContainerApiMixin:
             container (str): The container to diff
 
         Returns:
-            (str)
+            (list) A list of dictionaries containing the attributes `Path`
+                and `Kind`.
 
         Raises:
             :py:class:`docker.errors.APIError`
@@ -860,8 +869,8 @@ class ContainerApiMixin:
                 params['since'] = since
             else:
                 raise errors.InvalidArgument(
-                    'since value should be datetime or positive int/float, '
-                    'not {}'.format(type(since))
+                    'since value should be datetime or positive int/float,'
+                    f' not {type(since)}'
                 )
 
         if until is not None:
@@ -877,8 +886,8 @@ class ContainerApiMixin:
                 params['until'] = until
             else:
                 raise errors.InvalidArgument(
-                    'until value should be datetime or positive int/float, '
-                    'not {}'.format(type(until))
+                    f'until value should be datetime or positive int/float, '
+                    f'not {type(until)}'
                 )
 
         url = self._url("/containers/{0}/logs", container)
@@ -950,7 +959,7 @@ class ContainerApiMixin:
             return port_settings.get(private_port)
 
         for protocol in ['tcp', 'udp', 'sctp']:
-            h_ports = port_settings.get(private_port + '/' + protocol)
+            h_ports = port_settings.get(f"{private_port}/{protocol}")
             if h_ports:
                 break
 
@@ -966,7 +975,7 @@ class ContainerApiMixin:
             container (str): The container where the file(s) will be extracted
             path (str): Path inside the container where the file(s) will be
                 extracted. Must exist.
-            data (bytes): tar data to be extracted
+            data (bytes or stream): tar data to be extracted
 
         Returns:
             (bool): True if the call succeeds.
@@ -1126,7 +1135,7 @@ class ContainerApiMixin:
         self._raise_for_status(res)
 
     @utils.check_resource('container')
-    def stats(self, container, decode=None, stream=True):
+    def stats(self, container, decode=None, stream=True, one_shot=None):
         """
         Stream statistics for a specific container. Similar to the
         ``docker stats`` command.
@@ -1138,6 +1147,9 @@ class ContainerApiMixin:
                 False by default.
             stream (bool): If set to false, only the current stats will be
                 returned instead of a stream. True by default.
+            one_shot (bool): If set to true, Only get a single stat instead of
+                waiting for 2 cycles. Must be used with stream=false. False by
+                default.
 
         Raises:
             :py:class:`docker.errors.APIError`
@@ -1145,16 +1157,30 @@ class ContainerApiMixin:
 
         """
         url = self._url("/containers/{0}/stats", container)
+        params = {
+            'stream': stream
+        }
+        if one_shot is not None:
+            if utils.version_lt(self._version, '1.41'):
+                raise errors.InvalidVersion(
+                    'one_shot is not supported for API version < 1.41'
+                )
+            params['one-shot'] = one_shot
         if stream:
-            return self._stream_helper(self._get(url, stream=True),
-                                       decode=decode)
+            if one_shot:
+                raise errors.InvalidArgument(
+                    'one_shot is only available in conjunction with '
+                    'stream=False'
+                )
+            return self._stream_helper(
+                self._get(url, stream=True, params=params), decode=decode
+            )
         else:
             if decode:
                 raise errors.InvalidArgument(
                     "decode is only available in conjunction with stream=True"
                 )
-            return self._result(self._get(url, params={'stream': False}),
-                                json=True)
+            return self._result(self._get(url, params=params), json=True)
 
     @utils.check_resource('container')
     def stop(self, container, timeout=None):
