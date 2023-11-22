@@ -4,8 +4,8 @@ import urllib
 from functools import partial
 
 import requests
+import requests.adapters
 import requests.exceptions
-import websocket
 
 from .. import auth
 from ..constants import (DEFAULT_NUM_POOLS, DEFAULT_NUM_POOLS_SSH,
@@ -15,7 +15,7 @@ from ..constants import (DEFAULT_NUM_POOLS, DEFAULT_NUM_POOLS_SSH,
 from ..errors import (DockerException, InvalidVersion, TLSParameterError,
                       create_api_error_from_http_exception)
 from ..tls import TLSConfig
-from ..transport import SSLHTTPAdapter, UnixHTTPAdapter
+from ..transport import UnixHTTPAdapter
 from ..utils import check_resource, config, update_headers, utils
 from ..utils.json_stream import json_stream
 from ..utils.proxy import ProxyConfig
@@ -184,7 +184,7 @@ class APIClient(
             if isinstance(tls, TLSConfig):
                 tls.configure_client(self)
             elif tls:
-                self._custom_adapter = SSLHTTPAdapter(
+                self._custom_adapter = requests.adapters.HTTPAdapter(
                     pool_connections=num_pools)
                 self.mount('https://', self._custom_adapter)
             self.base_url = base_url
@@ -309,7 +309,16 @@ class APIClient(
         return self._create_websocket_connection(full_url)
 
     def _create_websocket_connection(self, url):
-        return websocket.create_connection(url)
+        try:
+            import websocket
+            return websocket.create_connection(url)
+        except ImportError as ie:
+            raise DockerException(
+                'The `websocket-client` library is required '
+                'for using websocket connections. '
+                'You can install the `docker` library '
+                'with the [websocket] extra to install it.'
+            ) from ie
 
     def _get_raw_response_socket(self, response):
         self._raise_for_status(response)

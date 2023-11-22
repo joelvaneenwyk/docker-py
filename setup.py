@@ -13,7 +13,6 @@ requirements = [
     'packaging >= 14.0',
     'requests >= 2.26.0',
     'urllib3 >= 1.26.0',
-    'websocket-client >= 0.32.0',
 ]
 
 extras_require = {
@@ -27,6 +26,9 @@ extras_require = {
 
     # Only required when connecting using the ssh:// protocol
     'ssh': ['paramiko>=2.4.3'],
+
+    # Only required when using websockets
+    'websockets': ['websocket-client >= 1.3.0'],
 }
 
 with open('./test-requirements.txt') as test_reqs_txt:
@@ -57,7 +59,7 @@ setup(
     install_requires=requirements,
     tests_require=test_requirements,
     extras_require=extras_require,
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     zip_safe=False,
     test_suite='tests',
     classifiers=[
@@ -67,11 +69,11 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Topic :: Software Development',
         'Topic :: Utilities',
         'License :: OSI Approved :: Apache Software License',
