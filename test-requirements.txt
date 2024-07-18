@@ -1,4 +1,4 @@
-setuptools==65.5.1
+setuptools==70.0.0
 coverage==7.2.7
 ruff==0.0.284
 pytest==7.4.2
